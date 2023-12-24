@@ -11,7 +11,7 @@ import { Component, OnInit } from "@angular/core";
                 </div>
                 <div class="flex flex-col items-start gap-0">
                     <span class="leading-4 text-lg font-semibold whitespace-nowrap dark:text-white">StorageX</span>
-                    <div class="leading-4 text-xs font-thin whitespace-nowrap dark:text-white">your online file manager</div>
+                    <div class="leading-4 text-xs font-thin whitespace-nowrap dark:text-white">online file explorer</div>
                 </div>
 
             </a>
