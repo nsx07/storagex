@@ -64,17 +64,7 @@ export class TreeNodeComponent implements OnInit{
     interact(item: FileNode, event: DragEvent | MouseEvent) {
         if (event instanceof DragEvent) {
             
-            if (event.type.toLowerCase() == "dragstart") {
-                this.dragService.startDrag(item);
-            }
-
-            if (event.type.toLowerCase() == "dragend") {
-                this.dragService.endDrag(item);
-            }
-            
-            if (event.type.toLowerCase() == "dragenter") {
-                this.dragService.setSwapData(item);
-            }
+            this.interactHandler[event.type.toLowerCase()](item)
 
             return;
         }
@@ -84,6 +74,12 @@ export class TreeNodeComponent implements OnInit{
         }
         
         this.collapseOpened = !this.collapseOpened;
+    }
+
+    private interactHandler = {
+        dragstart: item => this.dragService.startDrag(item),
+        dragenter: item => this.dragService.setSwapData(item),
+        dragend: item => this.dragService.endDrag(item)
     }
 
     openClick(item: FileNode) {
