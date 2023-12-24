@@ -28,7 +28,8 @@ export class DragService {
     }
 
     public endDrag(data: FileNode) {
-        if (this._swap.drop == null || this._swap.drag!.uid == this._swap.drop.uid || this._swap.drop.content?.find(x => x.uid == this._swap.drag!.uid)) {
+        if (this._swap.drop == null || this._swap.drag!.uid == this._swap.drop.uid 
+            || this._swap.drop.content?.find(x => x.uid == this._swap.drag!.uid)) {
             return;
         }
 

@@ -9,11 +9,19 @@ export class StorageApi {
 
     private baseUrl = environment.apiUrl;
 
-    constructor(private http: HttpClient) {
-        console.log('StorageApi');
+    constructor(private http: HttpClient) { }
+
+    public getUrlObject(path: string) {
+        return this.baseUrl + path;
     }
 
     public get(url: string, params?: Params) {
+        console.log(
+            'StorageApi.get()',
+            '\nurl:', this.baseUrl + url,
+            '\nparams:', params
+        );
+        
         return this.http.get<any>(this.baseUrl + url, {params: params});
     }
 
