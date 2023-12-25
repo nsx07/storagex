@@ -76,7 +76,7 @@ export class TreeNodeComponent implements OnInit{
         this.collapseOpened = !this.collapseOpened;
     }
 
-    private interactHandler = {
+    private interactHandler : Record<string, (item: FileNode) => void = {
         dragstart: item => this.dragService.startDrag(item),
         dragenter: item => this.dragService.setSwapData(item),
         dragend: item => this.dragService.endDrag(item)
