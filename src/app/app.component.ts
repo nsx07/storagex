@@ -6,6 +6,7 @@ import { StorageApi } from './services/storage-api.service';
 import { HttpClientModule } from '@angular/common/http';
 import { TreeNodeComponent } from './components/tree-node.component';
 import { DragService } from './services/drag.service';
+import { getUrlParsed } from './utils/helper-url';
 
 export type FileNode = {
   uid: string;
@@ -43,7 +44,7 @@ export type FileNode = {
           
           @if (data) {
             <div class="bg-gray-100 dark:bg-slate-600 p-2 rounded-md">
-              <tree-node [item]="data" (open)="open($event)"></tree-node>
+              <tree-node [item]="data" (open)="open($event)" (delete)="deleteNode($event)"></tree-node>
             </div>
           }
         </div>
@@ -90,7 +91,11 @@ export class AppComponent implements OnInit {
   private dragService = inject(DragService);
 
   ngOnInit(): void {
-    this.storageApi.get("api/listTree").subscribe((data: Array<FileNode>) => this.data = this.prepareData(data)[0]);
+    this.storageApi.get("api/listTree").subscribe((data: Array<FileNode>) => {
+      this.data = this.prepareData(data)[0]
+      console.log(this.data);
+      
+    });
     this.dragService.swap().subscribe(swap => this.swap(swap.drag!, swap.drop!))
   }
 
@@ -117,6 +122,32 @@ export class AppComponent implements OnInit {
     }
    
     entry.content.push(node);
+  }
+
+  deleteNode(node: FileNode) {
+    console.log("delete", node);
+
+    let url = getUrlParsed(node.path);
+
+    let options = {
+      body: {
+        projectName: url.projectName,
+        projectScope: url.projectScope,
+        fileName: node.name
+      }
+    };
+    console.log(options);
+
+    let endpoint = node.type == "folder" ? "api/deleteDirectory" : "api/delete";
+    
+
+    options.body.projectName && this.storageApi.delete(endpoint, undefined, options).subscribe({
+      next: () => {
+        this.takeFromTree(node);
+      },
+      error: (err) => console.log(err)
+    });
+    
   }
 
   takeFromTree(target: FileNode, node: FileNode = this.data) {

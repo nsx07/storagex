@@ -33,8 +33,8 @@ export class StorageApi {
         return this.http.put<any>(this.baseUrl + url, body, {params: params});
     }
 
-    public delete(url: string, params?: Params) {
-        return this.http.delete<any>(this.baseUrl + url, {params: params});
+    public delete(url: string, params?: Params, options?: any) {
+        return this.http.delete<any>(this.baseUrl + url, {params: params, ...options});
     }
 
 }
