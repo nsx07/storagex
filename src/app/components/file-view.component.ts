@@ -1,5 +1,5 @@
 import { CommonModule } from "@angular/common";
-import { Component, EventEmitter, Input, OnInit, Output, inject } from "@angular/core";
+import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges, inject } from "@angular/core";
 import { StorageApi } from "../services/storage-api.service";
 import { HttpEvent } from "@angular/common/http";
 
@@ -8,9 +8,9 @@ import { HttpEvent } from "@angular/common/http";
     imports: [CommonModule],
     standalone: true,
     template: `
-        <div class="w-full bg-slate-500 rounded-md md:block hidden" *ngIf="_visible">
-          <div class="flex justify-between items-center p-2">
-            <h1 *ngIf="src" class="italic text-lg font-semibold whitespace-nowrap p-2 dark:text-white">wwwroot{{src.split("wwwroot")[1]}} </h1>
+        <div class="w-full bg-slate-500 rounded-md" *ngIf="_visible">
+          <div class="flex justify-between items-center p-2 w-full">
+            <h1 *ngIf="src" class="italic text-lg text-ellipsis overflow-hidden font-semibold whitespace-nowrap p-2 dark:text-white">wwwroot{{src.split("wwwroot")[1]}} </h1>
             <div class="flex items-center gap-2">
               <a class="cursor-pointer px-2" [href]="src" target="_blank" rel="noopener noreferrer">
                 <i class="fa-solid fa-up-right-from-square"></i>
@@ -23,7 +23,7 @@ import { HttpEvent } from "@angular/common/http";
               </span>
             </div>
           </div>
-          <div class="">
+          <div class="w-full">
             @if (isImage(src!)) {
               <div class="w-full max-h-[60vh] overflow-y-auto bg-white">
                 <img class="w-full h-auto" [src]="src">
@@ -44,16 +44,18 @@ import { HttpEvent } from "@angular/common/http";
         </div>
     `
 })
-export class FileViewComponent implements OnInit {
+export class FileViewComponent implements OnChanges {
     
-    async ngOnInit() {
+    async ngOnChanges(changes: SimpleChanges) {
+      console.log(changes);
+      
+      
       this.src = encodeURI(this.src!);
       await this.checkFileExtension(this.src!);
       
       this.visible = this.src != '';
     }
 
-    
     @Input() 
     get visible() { return this._visible; }
     set visible(value: boolean) { this._visible = value; }

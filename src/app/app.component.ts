@@ -30,8 +30,8 @@ export type FileNode = {
     </div>
     <div class="container mx-auto w-full py-4 md:px-2 px-4" (contextmenu)="context($event)">
         
-      <div class="grid grid-cols-2 gap-2">
-        <div class="col-span-2" [ngClass]="{'md:col-span-1': src}">
+      <div class="grid md:grid-cols-2 grid-cols-1 gap-2">
+        <div class="col-span-2" [ngClass]="{'col-span-1': src}">
           <h1 class="italic text-xl font-semibold whitespace-nowrap p-2 dark:text-white">File Explorer</h1>
           
           @if (data) {
@@ -50,7 +50,7 @@ export type FileNode = {
           }
         </div>
         
-        <div class="md:col-span-1" *ngIf="fileView">
+        <div class="col-span-1" *ngIf="fileView">
           <file-view [src]="src" [visible]="fileView" (close)="close()"></file-view>
         </div>
       
