@@ -14,11 +14,11 @@ import { FormsModule } from "@angular/forms";
     template: `
         <div class="w-full" draggable="true" dropzone="true" (dragover)="interact(item, $event)" (drop)="interact(item, $event)">
             <context-menu [items]="contextItens">  
-                <div class="p-2 cursor-pointer rounded dark:hover:bg-slate-500 hover:bg-slate-300 w-full z-10" (dragenter)="interact(item, $event)" 
-                    (click)="interact(item, $event)" (dragstart)="interact(item, $event)" (dragend)="interact(item, $event)">
+                <div class="cursor-pointer rounded dark:hover:bg-slate-500 hover:bg-slate-300 w-full" (dragenter)="interact(item, $event)" 
+                    (dragstart)="interact(item, $event)" (dragend)="interact(item, $event)">
 
-                        <div class="italic w-full rounded-md flex items-center justify-between gap-2 pl-2 text-slate-900 dark:text-slate-200">
-                            <div class="flex gap-4 items-center">
+                        <div class="italic w-full rounded-md flex items-center justify-between gap-2 p-2 text-slate-900 dark:text-slate-200">
+                            <div class="flex gap-4 items-center" (click)="interact(item, $event)">
                                 @if (item.type == "file") {
                                     <i class="fa-solid fa-file-lines"></i>
                                 } @else {
@@ -35,7 +35,8 @@ import { FormsModule } from "@angular/forms";
 
                                 </span>
                             </div>
-                            <section class="md:hidden block z-20" (click)="openDialog()">
+
+                            <section class="md:hidden block z-20">
                                 <context-menu [items]="contextItens" [forMobile]="true">
                                     <div class="p-2 flex items-center">
                                         <i class="fa-solid fa-ellipsis-vertical"></i>
@@ -43,8 +44,8 @@ import { FormsModule } from "@angular/forms";
                                 </context-menu>
                             </section>
                             <section class="gap-2 md:flex hidden">
-                                <span class="pl-2 leading-tight font-medium text-lg" inert>{{item.size }}</span>
-                                <span class="pl-2 leading-tight font-medium text-lg" >{{item.datetime | date: "dd/MM/yy HH:mm"}}</span>
+                                <span class="pl-2 leading-tight font-medium text-lg">{{item.size }}</span>
+                                <span class="pl-2 leading-tight font-medium text-lg">{{item.datetime | date: "dd/MM/yy HH:mm"}}</span>
                             </section>
                         </div>
                         
@@ -120,12 +121,12 @@ export class TreeNodeComponent implements OnInit {
         event.preventDefault();
         event.stopPropagation();
 
+        console.log(event.target.files);
+        
         if (event.target.files) {
             const formData = new FormData();
 
-            event.target.files = event.target.files.slice(0, 5);
-
-            for (let i = 0; i < event.target.files.length; i++) {
+            for (let i = 0; i < event.target.files.length || i == 5; i++) {
                 formData.append("file", event.target.files[i]);
             }
 
@@ -138,6 +139,9 @@ export class TreeNodeComponent implements OnInit {
     public interact(item: FileNode, event: DragEvent | MouseEvent) {
         event.preventDefault();
         event.stopPropagation();
+
+        console.log(event);
+        
 
         if (event.type == "dragover") {
             this.dragover = true;
@@ -208,28 +212,28 @@ export class TreeNodeComponent implements OnInit {
         }
     }
 
-    public openDialog() {
-        console.log("openDialog");
-        
-    }
-
     private uploader(formData: FormData) {
         
-        this.storageApi.post("api/save", formData, getUrlParsed(this.item.path)).subscribe(data => {
+        this.storageApi.post("api/save", formData, getUrlParsed(this.item.path)).subscribe({
+            next: data => {
 
-            if (Array.isArray(data)) {
-                data.forEach(x => {
-                    this.item.content.push({
-                        content: [],
-                        size: x.size,
-                        type: "file",
-                        name: x.fileName,
-                        datetime: new Date(),
-                        uid: crypto.randomUUID(),
-                        path: x.filePath.replace(`\\`, "/"),
-                        order: this.item.content.length + 1,
-                    })
-                });
+                if (Array.isArray(data)) {
+                    data.forEach(x => {
+                        this.item.content.push({
+                            content: [],
+                            size: x.size,
+                            type: "file",
+                            name: x.fileName,
+                            datetime: new Date(),
+                            uid: crypto.randomUUID(),
+                            path: x.filePath.replace(`\\`, "/"),
+                            order: this.item.content.length + 1,
+                        })
+                    });
+                }
+            },
+            complete: () => {
+                this.dragover = false;
             }
         });
     }
@@ -260,7 +264,11 @@ export class TreeNodeComponent implements OnInit {
             });
         
         },
-        newFile: () => this.dragover = true,
+        newFile: () => {
+            this.dragover = true;
+            console.log("new file");
+            
+        },
         rename: () => {
             this.rename = true;
         },

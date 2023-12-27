@@ -5,12 +5,14 @@ import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Host, HostListen
     selector: 'context-menu',
     imports: [CommonModule],
     template: `
-        <div (contextmenu)="context($event)" (click)="forMobile && context($event)">
-            <ng-content></ng-content>
-        </div>
+        <ng-container ariaHasPopup="true">
+            <div (contextmenu)="context($event)" (click)="forMobile && context($event)">
+                <ng-content></ng-content>
+            </div>
+        </ng-container>
         
-        <div class="block absolute z-20" *ngIf="contexton" [style.left]="menuTopLeftPosition.x" [style.top]="menuTopLeftPosition.y"> 
-            <div class="dark:bg-slate-700 bg-slate-100 border-gray-200 dark:border-slate-600 w-60 rounded-lg flex flex-col text-sm py-4 px-2 dark:text-slate-200 text-gray-700 shadow-lg cursor-pointer">
+        <div class="block absolute" *ngIf="contexton" [style.left]="menuTopLeftPosition.x" [style.top]="menuTopLeftPosition.y"> 
+            <div class="dark:bg-slate-700 bg-slate-100 border-gray-200 dark:border-slate-600 w-60 rounded-lg flex flex-col text-sm py-4 px-2 dark:text-slate-200 text-gray-700 shadow-lg cursor-pointer relative" style="z-index: 1000 !important;">
                 @for (item of items; track item.name) {
                     @if (item.separator) {
                         <div class="border-b border-gray-300 dark:border-gray-600"></div>
@@ -42,14 +44,17 @@ export class ContextMenuComponent {
     private changeDetector = inject(ChangeDetectorRef);
     
     @HostListener('document:click', ['$event']) 
-    clickout = () => this.contexton = false;
+    clickout (event: MouseEvent) {
+        this.contexton = false
+        
+    }
 
     public context(event: MouseEvent) {
         event.preventDefault();
         event.stopPropagation();    
         
         this.menuTopLeftPosition.x = event.clientX + 'px'; 
-        this.menuTopLeftPosition.y = event.clientY + 'px'; 
+        this.menuTopLeftPosition.y = event.clientY + 20 + 'px'; 
 
         if (event.clientX + 240 > window.innerWidth) {
             this.menuTopLeftPosition.x = (event.clientX - 240) + 'px'; 
