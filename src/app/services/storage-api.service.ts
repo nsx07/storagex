@@ -15,6 +15,10 @@ export class StorageApi {
         return (this.baseUrl + ('wwwroot/' + path).replaceAll(/[\/\\]+/g, "/"));
     }
 
+    public getRaw<T = any>(url: string, options: any) {
+        return this.http.get<T>(url, options);
+    }
+
     public get(url: string, params?: Params) {
         return this.http.get<any>(this.baseUrl + url, {params: params});
     }

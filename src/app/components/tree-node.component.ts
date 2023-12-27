@@ -12,7 +12,7 @@ import { FormsModule } from "@angular/forms";
     selector: 'tree-node',
     standalone: true,
     template: `
-        <div class="w-full" draggable="true" dropzone="true" (dragover)="interact(item, $event)" (drop)="interact(item, $event)">
+        <div class="w-full" draggable="true" dropzone="true" (dragover)="interact(item, $event)" (drop)="interact(item, $event)" (dragleave)="dragover = false">
             <context-menu [items]="contextItens">  
                 <div class="cursor-pointer rounded dark:hover:bg-slate-500 hover:bg-slate-300 w-full" (dragenter)="interact(item, $event)" 
                     (dragstart)="interact(item, $event)" (dragend)="interact(item, $event)">
