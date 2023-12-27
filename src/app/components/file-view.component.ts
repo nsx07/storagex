@@ -117,7 +117,7 @@ export class FileViewComponent implements OnChanges {
     download() {
       this.storageApi.getRaw<Blob>(this.src!, { responseType: 'blob' }).subscribe({
         next: (data: any) => {
-          const blob = new Blob([data], { type: 'application/pdf' }); // Adjust the content type based on your file type
+          const extension = this.src!.split("/").pop()!.split(".")[1]         const blob = new Blob([data], { type: 'application/' + extension }); // Adjust the content type based on your file type
           const url = window.URL.createObjectURL(blob);
           const a = document.createElement('a');
           
