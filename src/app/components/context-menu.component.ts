@@ -5,7 +5,7 @@ import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Host, HostListen
     selector: 'context-menu',
     imports: [CommonModule],
     template: `
-        <div (contextmenu)="context($event)">
+        <div (contextmenu)="context($event)" (click)="forMobile && context($event)">
             <ng-content></ng-content>
         </div>
         
@@ -34,8 +34,10 @@ import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Host, HostListen
 export class ContextMenuComponent {
 
     @Input() items: ContextItem[] = [];
+
+    @Input() contexton = false;
+    @Input() forMobile = false;
     
-    contexton = false;
     menuTopLeftPosition =  {x: '0', y: '0'};
     private changeDetector = inject(ChangeDetectorRef);
     

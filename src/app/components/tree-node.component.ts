@@ -32,8 +32,16 @@ import { FormsModule } from "@angular/forms";
                                     <div class="rounded-lg right-1 cursor-pointer dark:text-slate-400 text-slate-700" *ngIf="rename" (click)="changeName(undefined, true)">
                                         <i class="fa-solid fa-circle-check fa-lg"></i>
                                     </div>  
+
                                 </span>
                             </div>
+                            <section class="md:hidden block z-20" (click)="openDialog()">
+                                <context-menu [items]="contextItens" [forMobile]="true">
+                                    <div class="p-2 flex items-center">
+                                        <i class="fa-solid fa-ellipsis-vertical"></i>
+                                    </div>
+                                </context-menu>
+                            </section>
                             <section class="gap-2 md:flex hidden">
                                 <span class="pl-2 leading-tight font-medium text-lg" inert>{{item.size }}</span>
                                 <span class="pl-2 leading-tight font-medium text-lg" >{{item.datetime | date: "dd/MM/yy HH:mm"}}</span>
@@ -41,7 +49,6 @@ import { FormsModule } from "@angular/forms";
                         </div>
                         
                 </div>
-                
             </context-menu>
 
             @if (item.type == "folder") {
@@ -199,6 +206,11 @@ export class TreeNodeComponent implements OnInit {
             this.rename = false;
             return;
         }
+    }
+
+    public openDialog() {
+        console.log("openDialog");
+        
     }
 
     private uploader(formData: FormData) {
