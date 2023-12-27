@@ -12,21 +12,19 @@ export class StorageApi {
     constructor(private http: HttpClient) { }
 
     public getUrlObject(path: string) {
-        return this.baseUrl + path;
+        return (this.baseUrl + ('wwwroot/' + path).replaceAll(/[\/\\]+/g, "/"));
     }
 
     public get(url: string, params?: Params) {
-        console.log(
-            'StorageApi.get()',
-            '\nurl:', this.baseUrl + url,
-            '\nparams:', params
-        );
-        
         return this.http.get<any>(this.baseUrl + url, {params: params});
     }
 
     public post(url: string, body: any, params?: Params) {
         return this.http.post<any>(this.baseUrl + url, body, {params: params});
+    }
+
+    public patch(url: string, body: any, params?: Params) {
+        return this.http.patch<any>(this.baseUrl + url, body, {params: params});
     }
 
     public put(url: string, body: any, params?: Params) {

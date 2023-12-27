@@ -9,7 +9,7 @@ import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Host, HostListen
             <ng-content></ng-content>
         </div>
         
-        <div class="block absolute" *ngIf="contexton" [style.left]="menuTopLeftPosition.x" [style.top]="menuTopLeftPosition.y"> 
+        <div class="block absolute z-20" *ngIf="contexton" [style.left]="menuTopLeftPosition.x" [style.top]="menuTopLeftPosition.y"> 
             <div class="dark:bg-slate-700 bg-slate-100 border-gray-200 dark:border-slate-600 w-60 rounded-lg flex flex-col text-sm py-4 px-2 dark:text-slate-200 text-gray-700 shadow-lg cursor-pointer">
                 @for (item of items; track item.name) {
                     @if (item.separator) {
@@ -64,6 +64,7 @@ export class ContextMenuComponent {
 }
 
 export type ContextItem = Partial<{
+    type: string;
     name: string;
     icon: string;
     disabled: boolean;

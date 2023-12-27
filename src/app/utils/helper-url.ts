@@ -6,7 +6,7 @@ export type UrlParsed = {
 }
 
 export function getUrlParsed(url: string): UrlParsed {
-    let urlParsed = url.split("/").filter((value) => value != "");
+    let urlParsed = url.split(/[\/\\]+/g).filter((value) => value != "");
     
     let projectName = urlParsed[0];
     let fileName = urlParsed[urlParsed.length - 1];
