@@ -50,7 +50,7 @@ export type FileNode = {
           }
         </div>
         
-        <div class="hidden md:block md:col-span-1" *ngIf="fileView">
+        <div class="md:col-span-1" *ngIf="fileView">
           <file-view [src]="src" [visible]="fileView" (close)="close()"></file-view>
         </div>
       
