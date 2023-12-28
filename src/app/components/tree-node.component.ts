@@ -6,6 +6,7 @@ import { StorageApi } from "../services/storage-api.service";
 import { ContextItem, ContextMenuComponent } from "./context-menu.component";
 import { getUrlParsed } from "../utils/helper-url";
 import { FormsModule } from "@angular/forms";
+import { getFileIcon } from "../utils/fileicon-type";
 
 @Component({
     imports: [CommonModule, ContextMenuComponent, FormsModule],
@@ -20,7 +21,8 @@ import { FormsModule } from "@angular/forms";
                         <div class="italic w-full rounded-md flex items-center justify-between gap-2 p-2 text-slate-900 dark:text-slate-200">
                             <div class="flex gap-4 items-center" (click)="interact(item, $event)">
                                 @if (item.type == "file") {
-                                    <i class="fa-solid fa-file-lines"></i>
+                                    <!-- <i class="fa-solid fa-file-lines"></i> -->
+                                    <img [src]="icon" width="20" height="auto" alt="icon-file-type">
                                 } @else {
                                     <i class="fa-solid" [ngClass]="{'fa-folder': !collapseOpened, 'fa-folder-open': collapseOpened}"></i>
                                 }
@@ -99,6 +101,8 @@ export class TreeNodeComponent implements OnInit {
             {type: "*", separator: true},
             {type: "*", name: "Delete", icon: "fa-solid fa-trash", command: () => this.commandHandler.delete(this.item)},
         ].filter(x => x.type == "*" || x.type == this.item.type);
+        
+        this.getIcon();
 
         this.oldName = this.item.name;
     }
@@ -107,8 +111,9 @@ export class TreeNodeComponent implements OnInit {
     @Output() open = new EventEmitter<FileNode>();
     @Output() delete = new EventEmitter<FileNode>();
 
-    public rename = false;
+    public icon?: string;
     private oldName = "";
+    public rename = false;
     public dragover = false;
     public collapseOpened = false;
     public contextItens: ContextItem[] = [];
@@ -134,6 +139,13 @@ export class TreeNodeComponent implements OnInit {
 
         }
         
+    }
+
+    private getIcon() {
+        if (this.item.type == "folder") 
+            return;
+
+        this.icon = getFileIcon(this.item.name.split(".")[1]);
     }
 
     public interact(item: FileNode, event: DragEvent | MouseEvent) {

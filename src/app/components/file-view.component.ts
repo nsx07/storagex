@@ -1,7 +1,8 @@
 import { CommonModule } from "@angular/common";
-import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges, inject } from "@angular/core";
+import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SecurityContext, SimpleChanges, inject } from "@angular/core";
 import { StorageApi } from "../services/storage-api.service";
 import { HttpEvent } from "@angular/common/http";
+import { DomSanitizer } from "@angular/platform-browser";
 
 @Component({
     selector: 'file-view',
@@ -25,18 +26,31 @@ import { HttpEvent } from "@angular/common/http";
           </div>
           <div class="w-full">
             @if (isImage(src!)) {
-              <div class="w-full max-h-[60vh] overflow-y-auto bg-white">
+              <div class="w-full max-h-[80vh] rounded-b-md bg-slate-950 overflow-y-auto">
                 <img class="w-full h-auto" [src]="src">
               </div>
             } @else if (isText(src!)) {
-              <div class="w-full max-h-[60vh] overflow-y-auto bg-white">
+              <div class="w-full max-h-[80vh] rounded-b-md bg-slate-950 overflow-y-auto">
                 <pre class="p-2 text-sm whitespace-pre-wrap">{{fileContent}}</pre>
               </div>
+            } @else if (isRenderable(src!)) {
+              <div class="w-full max-h-[80vh] rounded-b-md bg-slate-950 overflow-y-auto">
+                <div [innerHTML]="fileContent"></div>
+              </div>
+            } @else if (isVideo(src!)) {
+              <div class="w-full max-h-[80vh] rounded-b-md bg-slate-950 overflow-y-auto">
+                <video class="w-full h-auto" controls>
+                  <source [src]="src" type="video/mp4">
+                  <source [src]="src" type="video/ogg">
+                  <source [src]="src" type="video/webm">
+                  <source [src]="src" type="video/mkv">
+                </video>
+              </div>
             } @else {
-              <div class="w-full h-full bg-white flex justify-center items-center">
-                <div class="p-2 text-xl">
+              <div class="w-full h-full bg-slate-200 flex justify-center items-center rounded-b-md">
+                <div class="p-2 text-lg text-slate-700 leading-5 font-thin">
                   <i class="fa-regular fa-face-frown-open mr-3"></i>
-                  This file extension is not supported yet
+                  <em>This file extension is not supported yet</em>
                 </div>
               </div>
             }
@@ -63,6 +77,7 @@ export class FileViewComponent implements OnChanges {
     @Input() src?: string; 
     @Output() close = new EventEmitter<void>();
     private storageApi = inject(StorageApi);
+    private sanitize = inject(DomSanitizer);
     
     _visible = false;
     fileContent!: string | ArrayBuffer | null;
@@ -72,14 +87,22 @@ export class FileViewComponent implements OnChanges {
     }
 
     isText(value: string) {
-      return value.endsWith(".txt") || value.endsWith(".json") || value.endsWith(".xml") || value.endsWith(".html") || value.endsWith(".css") || value.endsWith(".js");
+      return value.endsWith(".txt") || value.endsWith(".json") || value.endsWith(".xml") || value.endsWith(".css") || value.endsWith(".js");
+    }
+
+    isVideo(value: string) {
+      return value.endsWith(".mp4") || value.endsWith(".webm") || value.endsWith(".ogg") || value.endsWith(".mkv");
+    }
+
+    isRenderable(value: string) {
+      return value.endsWith("html");
     }
 
     checkFileExtension(value: string) {
       return new Promise((resolve, reject) => {
         if (this.isImage(value)) {
           return resolve(true);
-        } else if (this.isText(value)) {
+        } else if (this.isText(value) || this.isRenderable(value)) {
           return this.uploadFile();
         }
 
@@ -95,7 +118,7 @@ export class FileViewComponent implements OnChanges {
             let fileReader: FileReader = new FileReader();
             
             fileReader.onloadend = (x) => {
-              this.fileContent = fileReader.result;
+              this.fileContent = this.sanitize.sanitize(SecurityContext.HTML, fileReader.result as string);
               console.log(this.fileContent);
               console.log(x.composedPath());
               
