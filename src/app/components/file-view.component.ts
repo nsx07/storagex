@@ -118,7 +118,7 @@ export class FileViewComponent implements OnChanges {
             let fileReader: FileReader = new FileReader();
             
             fileReader.onloadend = (x) => {
-              this.fileContent = this.sanitize.sanitize(SecurityContext.HTML, fileReader.result as string);
+              this.fileContent = fileReader.result as string;
               console.log(this.fileContent);
               console.log(x.composedPath());
               
