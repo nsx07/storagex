@@ -30,12 +30,12 @@ import { DomSanitizer } from "@angular/platform-browser";
                 <img class="w-full h-auto" [src]="src">
               </div>
             } @else if (isText(src!)) {
-              <div class="w-full max-h-[80vh] rounded-b-md bg-slate-950 overflow-y-auto">
+              <div class="w-full max-h-[80vh] rounded-b-md bg-slate-400 overflow-y-auto">
                 <pre class="p-2 text-sm whitespace-pre-wrap">{{fileContent}}</pre>
               </div>
             } @else if (isRenderable(src!)) {
-              <div class="w-full max-h-[80vh] rounded-b-md bg-slate-950 overflow-y-auto">
-                <div [innerHTML]="fileContent"></div>
+              <div class="w-full max-h-[80vh] rounded-b-md bg-slate-400 overflow-y-auto">
+                <div class="p-2 text-sm whitespace-pre-wrap" [innerHTML]="fileContent"></div>
               </div>
             } @else if (isVideo(src!)) {
               <div class="w-full max-h-[80vh] rounded-b-md bg-slate-950 overflow-y-auto">
