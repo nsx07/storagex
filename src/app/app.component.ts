@@ -3,11 +3,12 @@ import { CommonModule } from '@angular/common';
 import { RouterOutlet } from '@angular/router';
 import { NavComponent } from './components/nav.component';
 import { StorageApi } from './services/storage-api.service';
-import { HttpClientModule } from '@angular/common/http';
+import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
 import { TreeNodeComponent } from './components/tree-node.component';
 import { DragService } from './services/drag.service';
 import { getUrlParsed } from './utils/helper-url';
 import { FileViewComponent } from './components/file-view.component';
+import { AuthService } from './services/auth.service';
 
 export type FileNode = {
   uid: string;
@@ -59,7 +60,7 @@ export type FileNode = {
     </div>
 
   </div>`,
-  providers: [StorageApi, DragService],
+  providers: [StorageApi, DragService, AuthService],
   imports: [
     CommonModule, RouterOutlet, HttpClientModule, 
     NavComponent, TreeNodeComponent, FileViewComponent

@@ -1,20 +1,29 @@
-import { Component, OnInit } from "@angular/core";
+import { Component, OnInit, ViewChild, inject } from "@angular/core";
+import { AuthService } from "../services/auth.service";
+import { KindeUser } from "@kinde-oss/kinde-auth-pkce-js";
+import { CommonModule } from "@angular/common";
+import { ContextItem, ContextMenuComponent } from "./context-menu.component";
 
 @Component({
     selector: 'app-nav',
+    imports: [CommonModule, ContextMenuComponent],
     template: `
     <nav class="bg-white border-gray-200 px-2 sm:px-4 py-2.5 dark:bg-gray-800 shadow-md">
         <div class="container mx-auto flex flex-wrap items-center justify-between">
-            <a href="#" class="flex" inert>
-                <div class="flex items-center">
-                    <img src="../../assets/exs.png" class="mr-3 h-6 sm:h-9" alt="FlowBite Logo">
-                </div>
-                <div class="flex flex-col items-start gap-0">
-                    <span class="leading-4 text-lg font-semibold whitespace-nowrap dark:text-white">StorageX</span>
-                    <div class="leading-4 text-xs font-thin whitespace-nowrap dark:text-white">online file explorer</div>
-                </div>
+            <div>
+                <a href="#" class="flex" inert>
+                    <div class="flex items-center">
+                        <img src="../../assets/exs.png" class="mr-3 h-6 sm:h-9" alt="FlowBite Logo">
+                    </div>
+                    <div class="flex flex-col items-start gap-0">
+                        <span class="leading-4 text-lg font-semibold whitespace-nowrap dark:text-white">StorageX</span>
+                        <div class="leading-4 text-xs font-thin whitespace-nowrap dark:text-white">online file explorer</div>
+                    </div>
 
-            </a>
+                </a>
+            </div>
+
+            
             <div class="flex md:order-2">
                 <button class="text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 rounded-lg text-sm p-2.5"
                     id="theme-toggle" type="button">
@@ -29,14 +38,67 @@ import { Component, OnInit } from "@angular/core";
                         </path>
                     </svg>
                 </button>
+                <div class="cursor-pointer">
+                    <context-menu [items]="items" [forMobile]="true" (contextonChange)="context = $event">
+                        @if (loggedIn) {
+                            <span class="p-2 rounded-md border-2 shadow flex gap-2" inert>
+                                <span>{{toCapital(user.given_name!)}}</span>
+                                <span>
+                                    <i class="fa-solid opacity-60" [ngClass]="{'fa-chevron-down': !context, 'fa-chevron-up': context}"></i>
+                                </span>
+                            </span>
+                        } @else {
+                            <h3>Acessar</h3>
+                        }
+                    </context-menu>
+                </div>
+
             </div>
         </div>
     </nav>`,
-  standalone: true,
+  standalone: true
 })
 export class NavComponent implements OnInit {
   
-    ngOnInit(): void {
+    public auth = inject(AuthService)
+
+    context = false
+    loggedIn = false;
+    user!: KindeUser;
+    items: ContextItem[] = []
+
+    async ngOnInit() {
+        this.toggleHandler();
+
+        this.user = this.auth.getUsedData()!;
+        this.loggedIn = await this.auth.isLoggedIn();
+
+        this.items = [
+            {
+                name: 'Sign out',
+                icon: 'fa-solid fa-sign-out',
+                command: () => {
+                    this.auth.logout();
+                }
+            },
+            {
+                name: "Register",
+                icon: 'fa-solid fa-user',
+                command: () => {
+                    this.auth.register();
+                },
+                hidden: this.loggedIn,
+                checkDisabled: () => this.loggedIn
+            },
+        ]
+   
+    }
+
+    toCapital(str: string) {
+        return str.charAt(0).toUpperCase() + str.slice(1);
+    }
+
+    toggleHandler() {
         var themeToggleDarkIcon = document.getElementById('theme-toggle-dark-icon')!;
         var themeToggleLightIcon = document.getElementById('theme-toggle-light-icon')!;
     
@@ -77,6 +139,7 @@ export class NavComponent implements OnInit {
             }
             
         });
-      }
+    }
+
 
 }
