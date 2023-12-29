@@ -41,14 +41,14 @@ import { ContextItem, ContextMenuComponent } from "./context-menu.component";
                 <div class="cursor-pointer">
                     <context-menu [items]="items" [forMobile]="true" (contextonChange)="context = $event">
                         @if (loggedIn) {
-                            <span class="p-2 rounded-md border-2 shadow flex gap-2" inert>
+                            <span class="p-2 rounded-md border-2 border-gray-500 dark:border-gray-800 flex gap-2" inert>
                                 <span>{{toCapital(user.given_name!)}}</span>
                                 <span>
                                     <i class="fa-solid opacity-60" [ngClass]="{'fa-chevron-down': !context, 'fa-chevron-up': context}"></i>
                                 </span>
                             </span>
                         } @else {
-                            <span class="p-2 rounded-md border-2 flex gap-2" inert>
+                            <span class="p-2 rounded-md border-2 border-gray-500 dark:border-gray-800 flex gap-2" inert>
                                   <span>Acess</span>
                                   <span>
                                       <i class="fa-solid fa-right-from-bracket"></i>
