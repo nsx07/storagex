@@ -48,7 +48,12 @@ import { ContextItem, ContextMenuComponent } from "./context-menu.component";
                                 </span>
                             </span>
                         } @else {
-                            <h3>Acessar</h3>
+                            <span class="p-2 rounded-md border-2 shadow flex gap-2" inert>
+                                  <span>Acess</span>
+                                  <span>
+                                      <i class="fa-solid fa-right-from-bracket"></i>
+                                  </span>
+                            </span>
                         }
                     </context-menu>
                 </div>
