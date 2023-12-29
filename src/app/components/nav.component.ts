@@ -40,21 +40,23 @@ import { ContextItem, ContextMenuComponent } from "./context-menu.component";
                 </button>
                 <div class="cursor-pointer">
                     <context-menu [items]="items" [forMobile]="true" (contextonChange)="context = $event">
-                        @if (loggedIn) {
-                            <span class="p-2 rounded-md border-2 border-gray-500 dark:border-gray-800 flex gap-2" inert>
-                                <span>{{toCapital(user.given_name!)}}</span>
-                                <span>
-                                    <i class="fa-solid opacity-60" [ngClass]="{'fa-chevron-down': !context, 'fa-chevron-up': context}"></i>
-                                </span>
-                            </span>
-                        } @else {
-                            <span class="p-2 rounded-md border-2 border-gray-500 dark:border-gray-800 flex gap-2" inert>
-                                  <span>Acess</span>
+                        <span class="p-2 rounded-lg border-2 border-gray-500 dark:border-black dark:text-slate-200 flex gap-2" inert>
+                          @if (loggedIn) {
+                              
+                                  <span>{{toCapital(user.given_name!)}}</span>
                                   <span>
-                                      <i class="fa-solid fa-right-from-bracket"></i>
+                                      <i class="fa-solid opacity-60" [ngClass]="{'fa-chevron-down': !context, 'fa-chevron-up': context}"></i>
                                   </span>
-                            </span>
-                        }
+                              
+                          } @else {
+                              
+                                    <span>Acess</span>
+                                    <span>
+                                        <i class="fa-solid fa-right-from-bracket"></i>
+                                    </span>
+                              
+                          }
+                        </span>
                     </context-menu>
                 </div>
 
