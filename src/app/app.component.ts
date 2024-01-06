@@ -127,7 +127,7 @@ export class AppComponent implements OnInit {
     let endpoint = node.type == "folder" ? "api/deleteDirectory" : "api/delete";
     
 
-    options.body.projectName && this.storageApi.delete(endpoint, undefined, options).subscribe({
+    options.body.projectName && this.storageApi.delete(endpoint, options.body).subscribe({
       next: () => {
         this.takeFromTree(node);
       },

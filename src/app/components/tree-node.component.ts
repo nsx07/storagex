@@ -203,7 +203,9 @@ export class TreeNodeComponent implements OnInit {
     public changeName(event?: KeyboardEvent, save: boolean = false) {
         if (event?.key == "Enter" || save) {
             this.rename = false;
+            
             let path = this.item.path.replace(this.oldName, this.item.name);
+            console.log(this.item.path, path);
             (this.oldName !== this.item.name) && this.storageApi.patch("api/rename", {newPath: path, oldPath: this.item.path}).subscribe({
                 next: () => {
                     this.item.path = path;

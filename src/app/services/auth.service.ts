@@ -23,7 +23,7 @@ export class AuthService {
             on_redirect_callback: this.onRedirectCallback.bind(this),
         });
 
-        if (! (await this.kinde.isAuthenticated())) {
+        if (! (await this.kinde.isAuthenticated()) && navigator.onLine) {
             await this.kinde.login();
         }
         
@@ -31,7 +31,9 @@ export class AuthService {
     }
 
     async onRedirectCallback(user: KindeUser, appState?: object){
-        localStorage.setItem('user', JSON.stringify(user));
+        if (user) {
+            localStorage.setItem('user', JSON.stringify(user));
+        }
         console.log(user, await this.kinde?.getToken());
     }
 
@@ -41,6 +43,7 @@ export class AuthService {
 
     async logout(): Promise<any> {
         this.kinde?.logout();
+        localStorage.clear();
     }
 
     async register(): Promise<any> {
