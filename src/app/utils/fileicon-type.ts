@@ -1,7 +1,8 @@
 const baseIconUrl = "https://raw.githubusercontent.com/vscode-icons/vscode-icons/master/icons/file_type_";
 
 export const FileIconTypes : Record<string, string> = {
-    "file": "",
+    "text": "txt, csv, tsv, plaintext",
+    "image": "jpeg, jpg, gif, png, bmp, tiff, ico, webp",
     "access": "accdb, accdt, mdb, accda, accdc, accde, accdp, accdr, accdu, ade, adp, laccdb, ldb, mam, maq, mdw",
     "access2": "accdb, accdt, mdb, accda, accdc, accde, accdp, accdr, accdu, ade, adp, laccdb, ldb, mam, maq, mdw",
     "actionscript": "actionscript",
@@ -31,9 +32,9 @@ export const FileIconTypes : Record<string, string> = {
     "ng_guard_js": "guard.js",
     "ng_module_dart": "module.dart",
     "ng_module_ts": "module.ts",
-    "ng_module_js": "module.js",
     "ng_pipe_dart": "pipe.dart",
     "ng_pipe_ts": "pipe.ts",
+    "ng_module_js": "module.js",
     "ng_pipe_js": "pipe.js",
     "ng_routing_dart": "app-routing.module.dart",
     "ng_routing_ts": "app-routing.module.ts",
@@ -316,7 +317,6 @@ export const FileIconTypes : Record<string, string> = {
     "idris": "idr, lidr",
     "idrisbin": "ibc",
     "idrispkg": "ipkg",
-    "image": "jpeg, jpg, gif, png, bmp, tiff, ico, webp",
     "imba": "imba, imba2, imba",
     "inc": "inc, include",
     "infopath": "infopathxml, xsn, xsf, xtp2",
@@ -657,7 +657,6 @@ export const FileIconTypes : Record<string, string> = {
     "testjs": "test.js, test.jsx, test.mjs, spec.js, spec.jsx, spec.mjs",
     "testts": "test.ts, test.tsx, spec.ts, spec.tsx, e2e-test.ts, e2e-test.tsx, e2e-spec.ts, e2e-spec.tsx",
     "tex": "texi, tikz, tex, latex, bibtex, doctex",
-    "text": "csv, tsv, plaintext",
     "textile": "textile",
     "tiltfile": "tiltfile",
     "tfs": ".tfignore",
@@ -744,7 +743,8 @@ export const FileIconTypes : Record<string, string> = {
     "turbo": "turbo.json",
     "doppler": "doppler.yaml, doppler-template.yaml",
     "zip": "zip, rar, 7z, tar, tgz, bz, gz, bzip2, xz, bz2, zipx",
-    "zip2": "zip, rar, 7z, tar, tgz, bz, gz, bzip2, xz, bz2, zipx"
+    "zip2": "zip, rar, 7z, tar, tgz, bz, gz, bzip2, xz, bz2, zipx",
+    "file": "*",
 }
 
 export const getFileIcon = (extension: string) => {
@@ -754,19 +754,17 @@ export const getFileIcon = (extension: string) => {
         icon = extension;
     } else {
 
-        Object.entries(FileIconTypes).forEach((key) => {
-            if (key[1].includes(extension)) {
-                icon = key[0];
+        for (const [key, value] of Object.entries(FileIconTypes)) {
+            if (value.includes(extension) && value.search(extension) != -1) {
+                icon = key;
+                break;
             }
-        })
+        }
 
         if (!icon) {
             icon = "file";
         }
     }
 
-    console.log(baseIconUrl + icon + ".svg");
-    
-
-    return baseIconUrl + icon + ".svg";
+    return icon == "file" ? (baseIconUrl.substring(0, baseIconUrl.lastIndexOf("/")) + "/default_file.svg") : (baseIconUrl + icon + ".svg");
 }
