@@ -46,7 +46,7 @@ import { getFileIcon } from "../utils/fileicon-type";
                                 </context-menu>
                             </section>
                             <section class="gap-2 md:flex hidden">
-                                <span class="pl-2 leading-tight font-medium text-lg">{{(item.size).fileSize() }}</span>
+                                <span class="pl-2 leading-tight font-medium text-lg">{{item.size ? (item.size).fileSize() : item.size }}</span>
                                 <span class="pl-2 leading-tight font-medium text-lg">{{item.datetime | date: "dd/MM/yy HH:mm"}}</span>
                             </section>
                         </div>
