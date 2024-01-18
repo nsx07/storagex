@@ -14,22 +14,33 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
 
       <!-- Modal -->
       <div class="relative w-full cursor-pointer pointer-events-none transition-transform	 my-auto p-4">
-          <div
-              class="w-full py-2 bg-white cursor-default pointer-events-auto dark:bg-gray-800 relative rounded-xl mx-auto max-w-sm" [style]="style">
+          <div class="w-full py-2 bg-gray-300 cursor-default pointer-events-auto dark:bg-gray-800 relative rounded-xl mx-auto max-w-sm" [style]="style">
 
-              @if (closable) {
-                <button tabindex="-1" type="button" class="absolute top-2 right-2 rtl:right-auto rtl:left-2">
-                  <svg title="Close" tabindex="-1" class="h-4 w-4 cursor-pointer text-gray-400" (click)="visible = false"
-                      xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                      <path fill-rule="evenodd"
-                          d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
-                          clip-rule="evenodd"></path>
-                  </svg>
-                  <span class="sr-only">
-                      Close
-                  </span>
-                </button>
-              }
+              <div class="flex justify-between items-center p-2" *ngIf="header">
+                @if (title) {
+                  <div>
+                    <h3 class="text-lg font-semibold text-gray-700 dark:text-gray-200">
+                        {{title}}
+                    </h3>
+                  </div>
+                }
+                @if (closable) {
+                  <div class="min-w-8 flex justify-center">
+                    <button type="button" >
+                      <svg title="Close" tabindex="-1" class="h-4 w-4 cursor-pointer text-gray-400" (click)="visible = false"
+                          xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                          <path fill-rule="evenodd"
+                              d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                              clip-rule="evenodd"></path>
+                      </svg>
+                      <span class="sr-only">
+                          Close
+                      </span>
+                    </button>
+
+                  </div>
+                }
+              </div>
 
 
 
@@ -50,6 +61,8 @@ export class ModalComponent {
 
   isVisible = false;
 
+  @Input() header = false;
+  @Input() title = '';
   @Input() style: Record<string, string> = {};
   @Input() closable = true;
   @Input() 

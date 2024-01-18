@@ -10,6 +10,15 @@ export class AuthService {
 
     private isLogged = false;
 
+    private get baseUrl() {
+        return environment.apiUrl;
+    }
+
+    private set baseUrl(value: string) {
+        environment.apiUrl = value;
+        localStorage.setItem('apiUrl', value);
+    }
+
     public get isAuthenticated(): boolean {
         return this.isLogged;
     }
@@ -17,7 +26,7 @@ export class AuthService {
     private http = inject(HttpClient);
 
     async validateToken(token: string): Promise<any> {
-        return firstValueFrom(this.http.get<any>(environment.apiUrl + `api/validateToken?token=${token}`)).then(data => {
+        return firstValueFrom(this.http.get<any>(this.baseUrl + `api/validateToken?token=${token}`)).then(data => {
             localStorage.setItem('token', token);            
             return data;
         });

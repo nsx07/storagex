@@ -9,7 +9,14 @@ type Params = HttpParams | { [param: string]: string | number | boolean | readon
 @Injectable({providedIn: 'root'})
 export class StorageApi {
 
-    private baseUrl = environment.apiUrl;
+    private get baseUrl() {
+        return environment.apiUrl;
+    }
+
+    private set baseUrl(value: string) {
+        environment.apiUrl = value;
+        localStorage.setItem('apiUrl', value);
+    }
 
     private initiated = false
 
@@ -21,6 +28,11 @@ export class StorageApi {
         const obs = new Subject();
         obs.complete();
         return obs.asObservable();
+    }
+
+    public setApiUrl(url: string) {
+        this.baseUrl = url;
+        localStorage.setItem('apiUrl', url);
     }
 
     public getUrlObject(path: string) {
