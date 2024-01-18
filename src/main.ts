@@ -1,7 +1,6 @@
 import { bootstrapApplication } from '@angular/platform-browser';
 import { appConfig } from './app/app.config';
 import { AppComponent } from './app/app.component';
-import Tracker from '@openreplay/tracker';
 import { environment } from './environments/environment.development';
 
 Number.prototype.fileSize = function(this, a,b,c,d){
