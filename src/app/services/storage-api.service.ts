@@ -13,9 +13,8 @@ export class StorageApi {
 
     private initiated = false
 
-    constructor(private http: HttpClient, private auth: AuthService) {
-        this.auth.init().then(() => this.initiated = true);
-        this.auth.isLoggedIn().then((isLoggedIn) => this.initiated = true);
+    constructor(private http: HttpClient) {
+        
     }
 
     private empty () {

@@ -1,4 +1,4 @@
 export const environment = {
     production: true,
-    apiUrl: 'https://storage-production.up.railway.app/'
+    apiUrl: localStorage.getItem('apiUrl') ?? 'https://storage-production.up.railway.app/'
 }

@@ -38,27 +38,7 @@ import { ContextItem, ContextMenuComponent } from "./context-menu.component";
                         </path>
                     </svg>
                 </button>
-                <div class="cursor-pointer">
-                    <context-menu [items]="items" [forMobile]="true" (contextonChange)="context = $event">
-                        <span class="p-2 rounded-lg border-2 border-gray-500 dark:border-black dark:text-slate-200 flex gap-2" inert>
-                          @if (loggedIn) {
-                              
-                                  <span>{{toCapital(user.given_name!)}}</span>
-                                  <span>
-                                      <i class="fa-solid opacity-60" [ngClass]="{'fa-chevron-down': !context, 'fa-chevron-up': context}"></i>
-                                  </span>
-                              
-                          } @else {
-                              
-                                    <span>Acess</span>
-                                    <span>
-                                        <i class="fa-solid fa-right-from-bracket"></i>
-                                    </span>
-                              
-                          }
-                        </span>
-                    </context-menu>
-                </div>
+               
 
             </div>
         </div>
@@ -77,27 +57,7 @@ export class NavComponent implements OnInit {
     async ngOnInit() {
         this.toggleHandler();
 
-        this.user = this.auth.getUsedData()!;
-        this.loggedIn = await this.auth.isLoggedIn();
 
-        this.items = [
-            {
-                name: 'Sign out',
-                icon: 'fa-solid fa-sign-out',
-                command: () => {
-                    this.auth.logout();
-                }
-            },
-            {
-                name: "Register",
-                icon: 'fa-solid fa-user',
-                command: () => {
-                    this.auth.register();
-                },
-                hidden: this.loggedIn,
-                checkDisabled: () => this.loggedIn
-            },
-        ]
    
     }
 
