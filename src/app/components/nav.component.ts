@@ -10,7 +10,7 @@ import { ContextItem, ContextMenuComponent } from "./context-menu.component";
     <nav class="bg-white border-gray-200 px-2 sm:px-4 py-2.5 dark:bg-gray-800 shadow-md">
         <div class="container mx-auto flex flex-wrap items-center justify-between">
             <div>
-                <a href="#" class="flex" inert>
+                <a href="#" class="flex select-none">
                     <div class="flex items-center">
                         <img src="../../assets/exs.png" class="mr-3 h-6 sm:h-9" alt="FlowBite Logo">
                     </div>

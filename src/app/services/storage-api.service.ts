@@ -18,11 +18,7 @@ export class StorageApi {
         localStorage.setItem('apiUrl', value);
     }
 
-    private initiated = false
-
-    constructor(private http: HttpClient) {
-        
-    }
+    constructor(private http: HttpClient) {}
 
     private empty () {
         const obs = new Subject();
@@ -76,38 +72,28 @@ export class StorageApi {
             return subscription!
         });
     }
-    
 
     public get(url: string, params?: Params) {
-        // unwrap this observable to wait initiated variable be truly
         return this.http.get<any>(this.baseUrl + url, {params: params, withCredentials: false})
     }
 
     public post(url: string, body: any, params?: Params) {
-        return this.initiated 
-            ? this.http.post<any>(this.baseUrl + url, body, {params: params, withCredentials: false})
-            : this.empty();
+        return this.http.post<any>(this.baseUrl + url, body, {params: params, withCredentials: false});
 
     }
 
     public patch(url: string, body: any, params?: Params) {
-        return this.initiated 
-            ? this.http.patch<any>(this.baseUrl + url, body, {params: params, withCredentials: false})
-            : this.empty();
+        return this.http.patch<any>(this.baseUrl + url, body, {params: params, withCredentials: false});
 
     }
 
     public put(url: string, body: any, params?: Params) {
-        return this.initiated 
-            ? this.http.put<any>(this.baseUrl + url, body, {params: params, withCredentials: false})
-            : this.empty();
+        return this.http.put<any>(this.baseUrl + url, body, {params: params, withCredentials: false});
 
     }
 
     public delete(url: string, params?: Params, options?: any) {
-        return this.initiated 
-            ? this.http.delete<any>(this.baseUrl + url, {params: params, withCredentials: false, ...options})
-            : this.empty();
+        return this.http.delete<any>(this.baseUrl + url, {params: params, withCredentials: false, ...options});
 
     }
 

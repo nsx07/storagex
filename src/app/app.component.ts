@@ -11,6 +11,7 @@ import { FileViewComponent } from './components/file-view.component';
 import { AuthService } from './services/auth.service';
 import { ModalComponent } from './components/modal.component';
 import { FormsModule } from '@angular/forms';
+import { FileService } from './services/file.service';
 
 export type FileNode = {
   uid: string;
@@ -86,13 +87,13 @@ export type FileNode = {
           
           @if (data) {
             <div class="bg-gray-100 dark:bg-slate-600 p-2 rounded-md">
-              <div class="italic w-full rounded-md flex justify-between gap-2 px-5 text-slate-900 dark:text-slate-200">
+              <div class="tracking-wide leading-5 w-full rounded-md flex justify-between gap-2 px-5 text-slate-900 dark:text-slate-200">
                 <div class="p-2">
-                  <span class="pl-2 leading-tight font-medium text-lg" inert>Name</span>
+                  <span class="pl-2 leading-tight font-medium text-lg select-none">Name</span>
                 </div>
                 <div class="hidden gap-9 md:block">
-                  <span class="pl-2 leading-tight font-medium text-lg" inert>Size (B)</span>
-                  <span class="pl-2 leading-tight font-medium text-lg" inert>Updated</span>
+                  <span class="pl-2 leading-tight font-medium text-lg select-none">Size</span>
+                  <span class="pl-2 leading-tight font-medium text-lg select-none">Updated</span>
                 </div>
               </div>
               <tree-node [item]="data" (open)="open($event)" (delete)="deleteNode($event)"></tree-node>
@@ -109,7 +110,7 @@ export type FileNode = {
     </div>
 
   </div>`,
-  providers: [StorageApi, DragService, AuthService],
+  providers: [StorageApi, DragService, AuthService, FileService],
   imports: [
     CommonModule, RouterOutlet, HttpClientModule, FormsModule,
     NavComponent, TreeNodeComponent, FileViewComponent, ModalComponent
@@ -124,7 +125,7 @@ export class AppComponent implements OnInit {
   token = "";  
   tokenMessage = "";  
 
-  modal = true;
+  modal = false;
   fileView = false;
   loading = false;
   
@@ -207,7 +208,7 @@ export class AppComponent implements OnInit {
   deleteNode(node: FileNode) {
     console.log("delete", node);
 
-    let url = getUrlParsed(node.path);
+    let url = getUrlParsed(node.path, node.type === "folder", true);
 
     let options = {
       body: {

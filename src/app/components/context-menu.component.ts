@@ -11,8 +11,8 @@ import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Ho
             </div>
         </ng-container>
         
-        <div class="block absolute" *ngIf="contexton" [style.left]="menuTopLeftPosition.x" [style.top]="menuTopLeftPosition.y"> 
-            <div class="dark:bg-slate-900 bg-slate-100 border-gray-200 dark:border-slate-600 w-60 rounded-lg flex flex-col text-sm p-2 dark:text-slate-200 text-gray-700 shadow-lg cursor-pointer relative" style="z-index: 1000 !important;">
+        <div class="block absolute" *ngIf="contexton" [style.left]="menuTopLeftPosition.x" [style.top]="menuTopLeftPosition.y" style="z-index: 1000 !important;"> 
+            <div class="dark:bg-slate-900 bg-slate-100 border-gray-200 dark:border-slate-600 w-60 rounded-lg flex flex-col text-sm p-2 dark:text-slate-200 text-gray-700 shadow-lg cursor-pointer relative" >
                 @for (item of items; track item.name) {
                     @if (!checkHide(item)) {
                         @if (item.separator) {
@@ -22,7 +22,7 @@ import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Ho
                                 <div class="w-8 dark:text-gray-100 text-gray-950">
                                     <i [class]="item.icon"></i>
                                 </div>
-                                <div inert>{{ item.name }}</div>
+                                <div class="select-none">{{ item.name }}</div>
                             </div>
                         }
                     }

@@ -7,6 +7,7 @@ import { ContextItem, ContextMenuComponent } from "./context-menu.component";
 import { getUrlParsed } from "../utils/helper-url";
 import { FormsModule } from "@angular/forms";
 import { getFileIcon } from "../utils/fileicon-type";
+import { FileService } from "../services/file.service";
 
 @Component({
     imports: [CommonModule, ContextMenuComponent, FormsModule],
@@ -18,36 +19,43 @@ import { getFileIcon } from "../utils/fileicon-type";
                 <div class="cursor-pointer rounded dark:hover:bg-slate-500 hover:bg-slate-300 w-full" (dragenter)="interact(item, $event)" 
                     (dragstart)="interact(item, $event)" (dragend)="interact(item, $event)">
 
-                        <div class="italic w-full rounded-md flex items-center justify-between gap-2 p-2 text-slate-900 dark:text-slate-200">
-                            <div class="flex gap-4 items-center" (click)="interact(item, $event)">
+                        <div class="tracking-wide leading-5 w-full rounded-md flex items-center justify-between gap-2 p-2 text-slate-900 dark:text-slate-200">
+                            <div class="flex gap-4 items-center" (click)="interact(item, $event)" (dblclick)="interact(item, $event)">
                                 @if (item.type == "file") {
-                                    <!-- <i class="fa-solid fa-file-lines"></i> -->
                                     <img [src]="icon" width="20" height="auto" alt="icon-file-type">
                                 } @else {
                                     <i class="fa-solid" [ngClass]="{'fa-folder': !collapseOpened, 'fa-folder-open': collapseOpened}"></i>
                                 }
                                 <span class="relative flex w-max items-center rounded-lg dark:text-slate-200 text-slate-500" [ngClass]="{'border-2 dark:border-slate-300 border-slate-600 z-10 px-2 py-1': rename}">
-                                    <input type="text" [disabled]="!rename" [(ngModel)]="item.name" (keyup)="changeName($event)" [ngClass]="{'dark:text-slate-300 text-slate-600 z-10': rename, 'z-0': !rename}"
-                                        class="resize-none flex-1 w-44 text-ellipsis overflow-hidden border text-base focus:outline-none bg-transparent appearance-none border-transparent focus:border-transparent"
-                                    />
 
-                                    <div class="rounded-lg right-1 cursor-pointer dark:text-slate-400 text-slate-700" *ngIf="rename" (click)="changeName(undefined, true)">
-                                        <i class="fa-solid fa-circle-check fa-lg"></i>
-                                    </div>  
+                                    @if (rename) {
+                                        <input type="text" [disabled]="!rename" [(ngModel)]="item.name" (keyup)="changeName($event)" [ngClass]="{'dark:text-slate-300 text-slate-600 z-10': rename, 'z-0': !rename}"
+                                            class="resize-none flex-1 max-w-[50vw] text-ellipsis overflow-hidden border text-base focus:outline-none bg-transparent appearance-none border-transparent focus:border-transparent"
+                                        />
+
+                                        <div class="rounded-lg right-1 cursor-pointer dark:text-slate-400 text-slate-700" *ngIf="rename" (click)="changeName(undefined, true)">
+                                            <i class="fa-solid fa-circle-check fa-lg"></i>
+                                        </div>  
+                                    } @else {
+                                        <span class="resize-none flex-1 max-w-[50vw] text-ellipsis overflow-hidden border text-base focus:outline-none bg-transparent appearance-none border-transparent focus:border-transparent">
+                                            {{item.name}}
+                                        </span>
+                                    }
+
 
                                 </span>
                             </div>
 
                             <section class="md:hidden block z-20">
-                                <context-menu [items]="contextItens" [forMobile]="true">
+                                <context-menu [items]="contextItens" [forMobile]="true" style="z-index: auto;">
                                     <div class="p-2 flex items-center">
                                         <i class="fa-solid fa-ellipsis-vertical"></i>
                                     </div>
                                 </context-menu>
                             </section>
                             <section class="gap-2 md:flex hidden">
-                                <span class="pl-2 leading-tight font-medium text-lg">{{item.size ? (item.size).fileSize() : item.size }}</span>
-                                <span class="pl-2 leading-tight font-medium text-lg">{{item.datetime | date: "dd/MM/yy HH:mm"}}</span>
+                                <span class="pl-2 leading-tight font-medium text-md">{{item.size ? (item.size).fileSize() : item.size }}</span>
+                                <span class="pl-2 leading-tight font-medium text-md">{{item.datetime | date: "dd/MM/yy HH:mm"}}</span>
                             </section>
                         </div>
                         
@@ -97,6 +105,7 @@ export class TreeNodeComponent implements OnInit {
             {type: "folder", name: "New folder", icon: "fa-solid fa-folder-plus", command: () => this.commandHandler.newFolder()},
             {type: "folder", separator: true},
             {type: "file", name: "Open", icon: "fa-solid fa-folder-open", command: () => this.openClick(this.item), checkDisabled: () => this.item.type == "folder"},
+            {type: "file", name: "Download", icon: "fa-solid fa-download", command: () => this.fileService.download(this.storageApi.getUrlObject(this.item.path.replace(/\\/g, "/"))), checkDisabled: () => this.item.type == "folder"},
             {type: "*", name: "Rename", icon: "fa-solid fa-pencil", command: () => this.commandHandler.rename()},
             {type: "*", separator: true},
             {type: "*", name: "Delete", icon: "fa-solid fa-trash", command: () => this.commandHandler.delete(this.item)},
@@ -121,6 +130,7 @@ export class TreeNodeComponent implements OnInit {
 
     private storageApi = inject(StorageApi);
     private dragService = inject(DragService);
+    private fileService = inject(FileService);
 
     public upload(event: any) {
         event.preventDefault();
@@ -144,18 +154,15 @@ export class TreeNodeComponent implements OnInit {
     private getIcon() {
         if (this.item.type == "folder") 
             return;
-
-        this.icon = getFileIcon(this.item.name.split(".")[1]);
+            
+        this.icon = getFileIcon(this.item.name.substring(this.item.name.lastIndexOf(".") + 1));
     }
 
     public interact(item: FileNode, event: DragEvent | MouseEvent) {
         event.preventDefault();
         event.stopPropagation();
 
-        console.log(event);
-        
-
-        if (event.type == "dragover") {
+        if (event.type == "dragover" && 'dataTransfer' in event && event.dataTransfer?.items.length) {
             this.dragover = true;
             return;
         } else this.dragover = false;
@@ -190,7 +197,12 @@ export class TreeNodeComponent implements OnInit {
         }
 
         if (item.type == "file") {
-            this.openClick(item);
+            if (event.type == "dbclick") {
+                this.commandHandler.rename()
+            } else {
+                this.openClick(item);
+            }
+            return;
         }
         
         this.collapseOpened = !this.collapseOpened;
@@ -228,7 +240,9 @@ export class TreeNodeComponent implements OnInit {
 
     private uploader(formData: FormData) {
         
-        this.storageApi.post("api/save", formData, getUrlParsed(this.item.path)).subscribe({
+        console.log(getUrlParsed(this.item.path, false, false));
+        
+        this.storageApi.post("api/save", formData, getUrlParsed(this.item.path, this.item.type === "folder", false)).subscribe({
             next: data => {
 
                 if (Array.isArray(data)) {

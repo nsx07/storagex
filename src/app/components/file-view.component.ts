@@ -1,8 +1,6 @@
 import { CommonModule } from "@angular/common";
-import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SecurityContext, SimpleChanges, inject } from "@angular/core";
-import { StorageApi } from "../services/storage-api.service";
-import { HttpEvent } from "@angular/common/http";
-import { DomSanitizer } from "@angular/platform-browser";
+import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges, inject } from "@angular/core";
+import { FileService } from "../services/file.service";
 
 @Component({
     selector: 'file-view',
@@ -61,8 +59,6 @@ import { DomSanitizer } from "@angular/platform-browser";
 export class FileViewComponent implements OnChanges {
     
     async ngOnChanges(changes: SimpleChanges) {
-      console.log(changes);
-      
       
       this.src = encodeURI(this.src!);
       await this.checkFileExtension(this.src!);
@@ -76,9 +72,8 @@ export class FileViewComponent implements OnChanges {
     
     @Input() src?: string; 
     @Output() close = new EventEmitter<void>();
-    private storageApi = inject(StorageApi);
-    private sanitize = inject(DomSanitizer);
-    
+    private fileService = inject(FileService);
+
     _visible = false;
     fileContent!: string | ArrayBuffer | null;
     
@@ -99,65 +94,20 @@ export class FileViewComponent implements OnChanges {
     }
 
     checkFileExtension(value: string) {
-      return new Promise((resolve, reject) => {
+      return new Promise(async (resolve, reject) => {
         if (this.isImage(value)) {
           return resolve(true);
         } else if (this.isText(value) || this.isRenderable(value)) {
-          return this.uploadFile();
+          this.fileContent = await this.fileService.readFile(value) as string;
+          
         }
 
-        resolve(true);
+        return resolve(true);
       });
-    }
-
-    uploadFile() {
-      return new Promise((resolve, reject) => {
-        fetch(this.src!)
-          .then(async data => {
-            let blob = await data.blob();
-            let fileReader: FileReader = new FileReader();
-            
-            fileReader.onloadend = (x) => {
-              this.fileContent = fileReader.result as string;
-              console.log(this.fileContent);
-              console.log(x.composedPath());
-              
-              return resolve(true);
-            }
-
-            fileReader.readAsText(blob);
-          })
-          .catch(error => {
-            console.log(error);
-            return resolve(true);
-          });
-
-        
-      });
-      
     }
 
     download() {
-      this.storageApi.getRaw<Blob>(this.src!, { responseType: 'blob' }).subscribe({
-        next: (data: any) => {
-          const extension = this.src!.split("/").pop()!.split(".")[1];      const blob = new Blob([data], { type: 'application/' + extension }); // Adjust the content type based on your file type
-          const url = window.URL.createObjectURL(blob);
-          const a = document.createElement('a');
-          
-          console.log(this.src!.split("/").pop()!);
-          
-          a.href = url;
-          a.download = this.src!.split("/").pop()!; // Specify the desired file name
-          document.body.appendChild(a);
-          a.click();
-          document.body.removeChild(a);
-          window.URL.revokeObjectURL(url);
-        },
-        error: (error) => {
-          console.log(error);
-        }
-      
-      })
+      this.fileService.download(this.src!);
     }
 
     close_() {
