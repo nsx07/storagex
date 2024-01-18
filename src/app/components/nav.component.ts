@@ -1,6 +1,5 @@
 import { Component, OnInit, ViewChild, inject } from "@angular/core";
 import { AuthService } from "../services/auth.service";
-import { KindeUser } from "@kinde-oss/kinde-auth-pkce-js";
 import { CommonModule } from "@angular/common";
 import { ContextItem, ContextMenuComponent } from "./context-menu.component";
 
@@ -51,7 +50,6 @@ export class NavComponent implements OnInit {
 
     context = false
     loggedIn = false;
-    user!: KindeUser;
     items: ContextItem[] = []
 
     async ngOnInit() {
