@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 
 @Component({
   selector: 'modal',
@@ -16,16 +16,16 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
       <div class="relative w-full cursor-pointer pointer-events-none transition-transform	 my-auto p-4">
           <div class="w-full py-2 bg-gray-300 cursor-default pointer-events-auto dark:bg-gray-800 relative rounded-xl mx-auto max-w-sm" [style]="style">
 
-              <div class="flex justify-between items-center p-2" *ngIf="header">
+              <div class="flex justify-between items-center pb-2 px-4" *ngIf="header">
                 @if (title) {
                   <div>
-                    <h3 class="text-lg font-semibold text-gray-700 dark:text-gray-200">
+                    <h3 class="text-lg font-semibold text-gray-700 dark:text-gray-200" [ngClass]="{'hidden': title == 'hidden__'}">
                         {{title}}
                     </h3>
                   </div>
                 }
-                @if (closable) {
-                  <div class="min-w-8 flex justify-center">
+                @if (isClosable) {
+                  <div class="min-w-8 flex justify-end">
                     <button type="button" >
                       <svg title="Close" tabindex="-1" class="h-4 w-4 cursor-pointer text-gray-400" (click)="visible = false"
                           xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
@@ -57,30 +57,53 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
   `
   
 })
-export class ModalComponent {
+export class ModalComponent implements OnInit {
+  
+  ngOnInit(): void {
+    
+    this.header = this.header || !!this.title || this.closable;
+    this.title = this.title || (this.header ? 'hidden__' : '');
+  }
 
   isVisible = false;
+  isClosable = false;
 
   @Input() header = false;
   @Input() title = '';
   @Input() style: Record<string, string> = {};
-  @Input() closable = true;
+  
+  @Input() 
+  get closable(): boolean {
+    return this.isClosable;
+  }
+  set closable(value: boolean) {
+    if (value) {
+      this.open.emit(value);
+    } else {
+      this.close.emit(value);
+    }
+    
+    this.closableChange.emit(value);
+    this.isClosable = value;
+  }
   @Input() 
   get visible(): boolean {
     return this.isVisible;
   }
   set visible(value: boolean) {
     if (value) {
-      this.open.emit();
+      this.open.emit(value);
     } else {
-      this.close.emit();
+      this.close.emit(value);
     }
     
+    this.visibleChange.emit(value);
     this.isVisible = value;
   }
 
   
   @Output() visibleChange = new EventEmitter();
+  @Output() closableChange = new EventEmitter();
   @Output() open = new EventEmitter();
   @Output() close = new EventEmitter();
 

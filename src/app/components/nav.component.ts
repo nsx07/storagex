@@ -4,10 +4,10 @@ import { CommonModule } from "@angular/common";
 import { ContextItem, ContextMenuComponent } from "./context-menu.component";
 
 @Component({
-    selector: 'app-nav',
+    selector: 'navheader',
     imports: [CommonModule, ContextMenuComponent],
     template: `
-    <nav class="bg-white border-gray-200 px-2 sm:px-4 py-2.5 dark:bg-gray-800 shadow-md">
+    <nav class="bg-white border-gray-200 px-2 sm:px-4 py-2.5 dark:bg-gray-900 shadow-md sticky top-0 left-0">
         <div class="container mx-auto flex flex-wrap items-center justify-between">
             <div>
                 <a href="#" class="flex select-none">
@@ -23,7 +23,7 @@ import { ContextItem, ContextMenuComponent } from "./context-menu.component";
             </div>
 
             
-            <div class="flex md:order-2">
+            <div class="flex">
                 <button class="text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none dark:focus:ring-gray-700 rounded-lg text-sm p-2.5"
                     id="theme-toggle" type="button">
                     <svg id="theme-toggle-dark-icon" class="w-5 h-5 hidden" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
@@ -37,6 +37,11 @@ import { ContextItem, ContextMenuComponent } from "./context-menu.component";
                         </path>
                     </svg>
                 </button>
+                
+                <button (click)="login()" class="text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none dark:focus:ring-gray-700 rounded-lg text-sm p-2.5" type="button">
+                    API
+                </button>
+
                
 
             </div>
@@ -53,14 +58,15 @@ export class NavComponent implements OnInit {
     items: ContextItem[] = []
 
     async ngOnInit() {
-        this.toggleHandler();
-
-
-   
+        this.toggleHandler();   
     }
 
     toCapital(str: string) {
         return str.charAt(0).toUpperCase() + str.slice(1);
+    }
+
+    login() {
+        this.auth.input();
     }
 
     toggleHandler() {
