@@ -1,6 +1,6 @@
 import { CommonModule, DOCUMENT } from "@angular/common";
 import { Component, HostListener, Inject, Input } from "@angular/core";
-import { Router, RouterModule } from "@angular/router";
+import { Router, RouterModule, NavigationEnd } from "@angular/router";
 
 @Component({
     selector: 'sidebar',
@@ -54,7 +54,13 @@ export class SidebarComponent {
     constructor(
         @Inject(DOCUMENT) private document: Document,
         private router: Router
-      ) {}
+      ) {
+        this.router.events.subscribe(async (event) => {
+    			if (event instanceof NavigationEnd) {
+    				this.open = false;
+    			}
+    		})
+      }
     
     isCurrent(path: string) {
         return location.pathname.includes(path);
