@@ -122,9 +122,17 @@ import { ModalComponent } from '../../components/modal.component';
                         <label for="continuos" class="ms-2 text-sm font-medium select-none text-gray-900 dark:text-gray-300">Continuos</label>
                     </div>
                   </div>
+
             </div>
                  
           </form>
+
+          <div class="py-3 px-2 text-sm text-blue-800 rounded-lg bg-blue-50 dark:bg-gray-800 dark:text-blue-400 transition duration-150 ease-out hover:ease-in" role="alert" *ngIf="!formBackup.get('continuos').value">
+            <span class="font-medium align-top text-start text-wrap">
+              <i class="fa-solid fa-circle-exclamation fa-lg mr-2"></i>
+              span class="indent-8 tracking-tight"> Setting continuos to <code>false</code> will run this backup once and it won't be listed at this listing. </span>
+            </span>
+          </div>
 
           <div class="py-3 px-2 text-sm text-red-800 rounded-lg bg-red-50 dark:bg-gray-800 dark:text-red-400" role="alert" *ngIf="message && message.trimEnd().length">
             <span class="font-medium">Error!</span> {{message}}
