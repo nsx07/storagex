@@ -24,7 +24,7 @@ import { ModalComponent } from '../../components/modal.component';
         </button>
       </div>
 
-      <div class="relative overflow-x-auto shadow-md sm:rounded-lg">
+      <div class="relative overflow-x-auto shadow-md rounded-lg">
           <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400 p-2">
               <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-900 dark:text-slate-300">
                   <tr>
