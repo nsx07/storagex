@@ -30,7 +30,7 @@ export type FileNode = {
   standalone: true,
   selector: 'app-root',
   template: `
-  <div class="w-screen h-screen overflow-auto dark:bg-slate-700 bg-gray-300">
+  <div class="w-screen h-screen overflow-auto dark:bg-slate-700 backdrop-blur-lg bg-gray-300">
     <modal [(visible)]="modal" [(closable)]="closable">
       <div>
         <form id="token-form" class="py-2">

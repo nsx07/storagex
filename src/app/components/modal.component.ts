@@ -7,14 +7,14 @@ import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
   imports: [CommonModule],
   template : `
    @if (visible) {
-    <div class="fixed inset-0 z-40 min-h-full overflow-y-auto overflow-x-hidden transition flex items-center">
+    <div class="fixed inset-0 z-50 min-h-full overflow-y-auto overflow-x-hidden transition flex items-center">
     <!-- overlay -->
-      <div aria-hidden="true" class="fixed inset-0 w-full h-full backdrop-blur-sm bg-black/50 cursor-pointer">
+      <div aria-hidden="true" [class]="'fixed inset-0 w-full h-full bg-black/50 cursor-pointer ' + backdropClass" (click)="out($event)">
       </div>
 
       <!-- Modal -->
       <div class="relative w-full cursor-pointer pointer-events-none transition-transform	 my-auto p-4">
-          <div class="w-full py-2 bg-gray-300 cursor-default pointer-events-auto dark:bg-gray-800 relative rounded-xl mx-auto max-w-sm" [style]="style">
+          <div class="w-full py-2 bg-gray-300 cursor-default pointer-events-auto dark:bg-gray-800 relative rounded-xl mx-auto" [style]="style" [ngClass]="{'max-w-sm': !style || (style && !style['width'])}">
 
               <div class="flex justify-between items-center pb-2 px-4" *ngIf="header">
                 @if (title) {
@@ -68,8 +68,10 @@ export class ModalComponent implements OnInit {
   isVisible = false;
   isClosable = false;
 
-  @Input() header = false;
   @Input() title = '';
+  @Input() width = '';
+  @Input() header = false;
+  @Input() backdropClass = "backdrop-blur-sm";
   @Input() style: Record<string, string> = {};
   
   @Input() 
@@ -106,6 +108,13 @@ export class ModalComponent implements OnInit {
   @Output() closableChange = new EventEmitter();
   @Output() open = new EventEmitter();
   @Output() close = new EventEmitter();
+
+
+  out($event: MouseEvent) {
+    if (this.closable) {
+      this.visible = false;
+    }
+  }
 
 
 }

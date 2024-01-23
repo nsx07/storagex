@@ -17,7 +17,7 @@ import { TreeNodeComponent } from '../../components/tree-node.component';
   template: `
       <div class="container mx-auto w-full py-4 md:px-2 px-4" (contextmenu)="context($event)">
         
-        <h1 class="italic text-xl font-semibold whitespace-nowrap p-2 dark:text-white">File Explorer</h1>
+        <h1 class="text-xl font-semibold whitespace-nowrap p-2 dark:text-white">File Explorer</h1>
         
         <div class="grid md:grid-cols-2 grid-cols-1 gap-2" [ngClass]="{'md:grid-cols-2 grid-cols-1': fileView}">
           <div [ngClass]="{'md:col-span-1 col-span-2': fileView, 'col-span-2': !fileView}">
