@@ -78,7 +78,7 @@ import { ModalComponent } from '../../components/modal.component';
           </table>
       </div>
 
-      <modal [(visible)]="modal" [title]="title" [closable]="true" *ngIf="formBackup" [style]="{width: '40vw'}" [backdropClass]="'backdrop-opacity-50'">
+      <modal [(visible)]="modal" [title]="title" [closable]="true" *ngIf="formBackup" [backdropClass]="'backdrop-opacity-50'">
         <div class="px-3 pt-2">
 
           <form [formGroup]="formBackup">
