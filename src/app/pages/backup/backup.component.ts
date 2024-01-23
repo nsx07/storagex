@@ -242,7 +242,7 @@ export class BackupComponent implements OnInit {
           if (this.editing) {
             let index = this.data.findIndex(d => d.key === this.keySelected);
             this.data[index] = value;
-          } else {
+          } else if (value.continuos) {
             this.data.push(value);
           }
         }
