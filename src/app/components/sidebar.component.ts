@@ -14,7 +14,7 @@ import { Router, RouterModule } from "@angular/router";
             </svg>
         </button>
 
-        <aside id="default-sidebar" class="sm:fixed sm:pt-[3.75rem] pt-0 top-0 left-0 sm:z-20 z-[60] sm:w-64 w-screen h-screen  transition-transform translate-x-0" aria-label="Sidebar" [ngClass]="{'sm:max-w-12 max-w-screen-xl hidden': !open, 'absolute': open}"
+        <aside id="default-sidebar" class="sm:pt-[3.75rem] pt-0 top-0 left-0 sm:z-20 z-[60] sm:w-64 w-screen h-screen  transition-transform translate-x-0" aria-label="Sidebar" [ngClass]="{'sm:max-w-12 max-w-screen-xl sm:fixed hidden': !open, 'absolute': open}"
             (mouseenter)="open = true" (mouseleave)="open = false">
             <div class="h-full py-4 overflow-y-auto overflow-x-hidden bg-gray-50 dark:bg-gray-800" [ngClass]="{'px-3 ': open}">
                 <div class="sm:hidden flex justify-end">
