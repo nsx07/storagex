@@ -40,7 +40,7 @@ import { ModalComponent } from '../../components/modal.component';
                       <th scope="col" class="px-6 py-3">
                           Connection String
                       </th>
-                      <th class="text-center"> <i class="fa-solid fa-wrench fa-lg"></i> </th>
+                      <th class="text-center px-6 py-3"> <i class="fa-solid fa-wrench fa-lg"></i> </th>
                   </tr>
               </thead>
               <tbody>
@@ -58,7 +58,7 @@ import { ModalComponent } from '../../components/modal.component';
                       <td class="px-6 py-4">
                           {{item.connectionString}}
                       </td>
-                      <td>
+                      <td class="px-6 py-3">
                         <div class="flex justify-center gap-2 items-center">
                           <i (click)="update(item)" class="fa-solid fa-edit fa-lg cursor-pointer"></i>
                           <i (click)="remove(item.key)" class="fa-solid fa-trash fa-lg cursor-pointer"></i>
