@@ -256,7 +256,7 @@ export class BackupComponent implements OnInit {
 
   remove(key: string) {
     console.log(key);
-    this.storageApi.delete("api/removeBackup", {name:key.split(":")[1]}).subscribe({
+    this.storageApi.delete("api/removeBackup", {name:key}).subscribe({
       next: (x) => {
         console.log(x);
         if (x) {
