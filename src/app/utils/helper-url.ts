@@ -20,5 +20,5 @@ export function getUrlParsed(url: string, isFolder : boolean, isDelete: boolean)
     // }
     // projectName = url.slice(1);
 
-    return { projectName: urlParsed.slice(0, urlPArsed.length ? urlParsed.length - 1 : undefined).join("/"), projectScope: "",};
+    return { projectName: urlParsed.slice(0, urlParsed.length > 1 ? urlParsed.length - 1 : undefined).join("/"), projectScope: "",};
 }
