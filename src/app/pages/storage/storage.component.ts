@@ -119,19 +119,17 @@ export class StorageComponent {
 
     let url = getUrlParsed(node.path, node.type === "folder", true);
 
-    let options = {
-      body: {
-        projectName: url.projectName,
-        projectScope: url.projectScope,
-        fileName: node.name
-      }
+    let params = {
+      projectName: url.projectName,
+      projectScope: url.projectScope,
+      fileName: node.name
     };
-    console.log(options);
+    console.log(params);
 
     let endpoint = node.type == "folder" ? "api/deleteDirectory" : "api/delete";
     
 
-    options.body.projectName && this.storageApi.delete(endpoint, options.body).subscribe({
+    (params.projectName || params.fileName) && this.storageApi.delete(endpoint, params).subscribe({
       next: () => {
         this.takeFromTree(node);
       },

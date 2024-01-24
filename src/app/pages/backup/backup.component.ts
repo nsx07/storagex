@@ -4,6 +4,7 @@ import { StorageApi } from '../../services/storage-api.service';
 import { firstValueFrom } from 'rxjs';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ModalComponent } from '../../components/modal.component';
+import { CustomValidators } from '../../utils/custom-validators';
 
 @Component({
   selector: 'app-backup',
@@ -56,10 +57,19 @@ import { ModalComponent } from '../../components/modal.component';
                           {{item.cron}}
                       </td>
                       <td class="px-6 py-4">
-                          {{item.connectionString}}
+                          <span class="cursor-pointer" (click)="item.showString = !item.showString">
+                            <i class="fa-solid mr-2" [ngClass]="{
+                              'fa-eye': !item.showString, 
+                              'fa-eye-slash': item.showString
+                              }">
+                            </i>
+                          </span>
+                          @if (item.showString) {
+                            {{item.connectionString}}
+                          }
                       </td>
                       <td class="px-6 py-3">
-                        <div class="flex justify-center gap-2 items-center">
+                        <div class="flex justify-center gap-4 items-center">
                           <i (click)="update(item)" class="fa-solid fa-edit fa-lg cursor-pointer"></i>
                           <i (click)="remove(item.key)" class="fa-solid fa-trash fa-lg cursor-pointer"></i>
                         </div>
@@ -78,7 +88,7 @@ import { ModalComponent } from '../../components/modal.component';
           </table>
       </div>
 
-      <modal [(visible)]="modal" [title]="title" [closable]="true" *ngIf="formBackup" [backdropClass]="'backdrop-opacity-50'">
+      <modal [(visible)]="modal" [title]="title" [closable]="true" *ngIf="formBackup" [backdropClass]="'backdrop-opacity-50'" (close)="cancel()">
         <div class="px-3 pt-2">
 
           <form [formGroup]="formBackup">
@@ -139,7 +149,7 @@ import { ModalComponent } from '../../components/modal.component';
           </div>
           
           <div class="flex items-center justify-end gap-2 pt-4">
-            <button [disabled]="!formBackup.touched" (click)="cancel()" type="button" class="text-white disabled:cursor-not-allowed bg-red-700 disabled:bg-red-500 disabled:hover:bg-red-700 hover:bg-red-800 focus:ring-0 focus:outline-none font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center disabled:dark:bg-red-500 dark:bg-red-600 disabled:dark:hover:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-800">
+            <button (click)="cancel()" type="button" class="text-white disabled:cursor-not-allowed bg-red-700 disabled:bg-red-500 disabled:hover:bg-red-700 hover:bg-red-800 focus:ring-0 focus:outline-none font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center disabled:dark:bg-red-500 dark:bg-red-600 disabled:dark:hover:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-800">
               <i class="fa-solid fa-times mr-2"></i>
               Cancel
             </button>
@@ -173,10 +183,10 @@ export class BackupComponent implements OnInit {
   message = "";
   modal = false;
   loading = false;
+  keySelected = "";
   data: any[] = [];
   title = "New Backup";
   formBackup!: FormGroup;
-  keySelected = "";
 
   private storageApi = inject(StorageApi);
   private formBuilder = inject(FormBuilder);
@@ -196,10 +206,10 @@ export class BackupComponent implements OnInit {
   private createForm() {
     this.formBackup = this.formBuilder.group({
       zip: [true],
-      continuos: [true],
+      continuos: [true, [CustomValidators.link("cron")]],
       name: [null, Validators.required],
       // if omitted, server will execute at 01:00 GMT America/Sao_Paulo
-      cron: [null, Validators.required],
+      cron: [null, [CustomValidators.requiredIfTrue("continuos")]],
       folder: [null, Validators.required],
       connectionString: [null, Validators.required],
     });
@@ -212,7 +222,10 @@ export class BackupComponent implements OnInit {
 
   cancel() {
     this.formBackup.reset({continuos: true, zip: true});
+    this.keySelected = "";
     this.modal = false;
+    console.log('cancel');
+    
   }
 
   update(backup: any) {

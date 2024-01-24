@@ -8,18 +8,17 @@ export type UrlParsed = {
 export function getUrlParsed(url: string, isFolder : boolean, isDelete: boolean): UrlParsed {
     let urlParsed = url.split(/[\/\\]+/g).filter((value) => value != "");
     
-    let projectName = urlParsed[0];
-    let projectScope = urlParsed[1];
-    let fileName = url.slice(1);
+    // let projectName = urlParsed[0];
+    // let projectScope = urlParsed[1];
 
-    if (urlParsed.length <= 2) {
-        projectScope = "";
-    }
+    // if (urlParsed.length <= 2) {
+    //     projectScope = "";
+    // }
 
-    if (isFolder && !isDelete) {
-        projectName = fileName;
-        projectScope = "";
-    }
+    // if (isFolder && !isDelete) {
+    //     projectScope = "";
+    // }
+    // projectName = url.slice(1);
 
-    return { projectName, projectScope, fileName };
+    return { projectName: urlParsed.slice(0, urlParsed.length - 1).join("/"), projectScope: "",};
 }

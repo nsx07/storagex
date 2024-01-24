@@ -18,7 +18,7 @@ export class AuthService {
 
     private set baseUrl(value: string) {
         environment.apiUrl = value;
-        localStorage.setItem('apiUrl', value);
+        sessionStorage.setItem('apiUrl', value);
     }
 
     public get isAuthenticated(): boolean {
@@ -37,14 +37,14 @@ export class AuthService {
 
     async validateToken(token: string): Promise<any> {
         return firstValueFrom(this.http.get<any>(this.baseUrl + `api/validateToken?token=${token}`)).then(data => {
-            localStorage.setItem('token', token);
+            sessionStorage.setItem('token', token);
             this.isLogged = true;            
             return data;
         });
     }
 
     async autoDetectLogin() : Promise<boolean> {
-        const token = localStorage.getItem('token');
+        const token = sessionStorage.getItem('token');
         if (token) {
             const data = await this.validateToken(token);
             if (data.success) {
@@ -56,8 +56,8 @@ export class AuthService {
     }
 
     async logout() {
-        localStorage.removeItem('token');
-        localStorage.removeItem('url');
+        sessionStorage.removeItem('token');
+        sessionStorage.removeItem('url');
 
         this.isLogged = false;
     }

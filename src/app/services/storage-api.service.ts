@@ -15,7 +15,7 @@ export class StorageApi {
 
     private set baseUrl(value: string) {
         environment.apiUrl = value;
-        localStorage.setItem('apiUrl', value);
+        sessionStorage.setItem('apiUrl', value);
     }
 
     constructor(private http: HttpClient) {}
@@ -28,7 +28,7 @@ export class StorageApi {
 
     public setApiUrl(url: string) {
         this.baseUrl = url;
-        localStorage.setItem('apiUrl', url);
+        sessionStorage.setItem('apiUrl', url);
     }
 
     public getUrlObject(path: string) {
