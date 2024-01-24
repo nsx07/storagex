@@ -29,8 +29,8 @@ import { FileService } from "../services/file.service";
                                 <span class="relative flex w-max items-center rounded-lg dark:text-slate-200 text-slate-500" [ngClass]="{'border-2 dark:border-slate-300 border-slate-600 z-10 px-2 py-1': rename}">
 
                                     @if (rename) {
-                                        <input type="text" [disabled]="!rename" [(ngModel)]="item.name" (keyup)="changeName($event)" [ngClass]="{'dark:text-slate-300 text-slate-600 z-10': rename, 'z-0': !rename}"
-                                            class="resize-none flex-1 max-w-[50vw] text-ellipsis overflow-hidden border text-base focus:outline-none bg-transparent appearance-none border-transparent focus:border-transparent"
+                                        <input type="text" (click)="$event.stopPropagation()" [disabled]="!rename" [(ngModel)]="item.name" (keyup)="changeName($event)" [ngClass]="{'dark:text-slate-300 text-slate-600 z-10': rename, 'z-0': !rename}"
+                                            class="resize-none flex-1 max-w-[50vw] z-[100] text-ellipsis overflow-hidden border text-base focus:outline-none bg-transparent appearance-none border-transparent focus:border-transparent"
                                         />
 
                                         <div class="rounded-lg right-1 cursor-pointer dark:text-slate-400 text-slate-700" *ngIf="rename" (click)="changeName(undefined, true)">
