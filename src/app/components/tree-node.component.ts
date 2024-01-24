@@ -221,6 +221,9 @@ export class TreeNodeComponent implements OnInit {
             (this.oldName !== this.item.name) && this.storageApi.patch("api/rename", {newPath: path, oldPath: this.item.path}).subscribe({
                 next: () => {
                     this.item.path = path;
+
+                    this.renameChilds(this.item, this.oldName, this.item.name);
+
                     this.oldName = this.item.name;
                 },
                 error: (err) => {
@@ -235,6 +238,17 @@ export class TreeNodeComponent implements OnInit {
             this.item.name = this.oldName;
             this.rename = false;
             return;
+        }
+    }
+
+    private renameChilds(node: FileNode, old: string, updated: string) {
+        node.path.replace(old, updated);
+        for (const item of node.content) {
+            item.path.replace(old, updated);
+
+            if (item.content.length && item.type === "folder") {
+                this.renameChilds(item, old, updated);
+            }
         }
     }
 
