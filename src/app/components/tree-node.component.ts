@@ -246,7 +246,7 @@ export class TreeNodeComponent implements OnInit {
         for (const item of node.content) {
             item.path.replace(old, updated);
 
-            if (item.content.length && item.type === "folder") {
+            if (item.type === "folder" && item.content?.length) {
                 this.renameChilds(item, old, updated);
             }
         }
