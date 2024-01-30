@@ -105,7 +105,7 @@ export class TreeNodeComponent implements OnInit {
             {type: "folder", name: "New folder", icon: "fa-solid fa-folder-plus", command: () => this.commandHandler.newFolder()},
             {type: "folder", separator: true},
             {type: "file", name: "Open", icon: "fa-solid fa-folder-open", command: () => this.openClick(this.item), checkDisabled: () => this.item.type == "folder"},
-            {type: "file", name: "Download", icon: "fa-solid fa-download", command: () => this.fileService.download(this.storageApi.getUrlObject(this.item.path.replace(/\\/g, "/"))), checkDisabled: () => this.item.type == "folder"},
+            {type: "*", name: "Download", icon: "fa-solid fa-download", command: () => this.fileService.download(this.storageApi.getUrlObject(this.item.path.replace(/\\/g, "/")), this.item.type == "folder")},
             {type: "*", name: "Rename", icon: "fa-solid fa-pencil", command: () => this.commandHandler.rename()},
             {type: "*", separator: true},
             {type: "*", name: "Delete", icon: "fa-solid fa-trash", command: () => this.commandHandler.delete(this.item)},

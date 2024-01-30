@@ -107,7 +107,7 @@ export class FileViewComponent implements OnChanges {
     }
 
     download() {
-      this.fileService.download(this.src!);
+      this.fileService.download(this.src!, false);
     }
 
     close_() {

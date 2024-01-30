@@ -8,27 +8,52 @@ export class FileService {
 
   constructor(private storageApi: StorageApi) { }
 
-  download(file: string) {
-    this.storageApi.getRaw<Blob>(file, { responseType: 'blob' }).subscribe({
-      next: (data: any) => {
-        const extension = file.split("/").pop()!.split(".")[1];      
-        const blob = new Blob([data], { type: 'application/' + extension });
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
+  download(file: string, isFolder : boolean) {
+    if (isFolder) {
+      this.downloadZip(file.substring(file.lastIndexOf("wwwroot") + 8));
+      return;
+    }
+    this.downloadFile(file);  
+  }
+
+  private downloadZip(folder: string) {
+    this.storageApi.get("api/downloadZip", { path: folder }).subscribe({
+      next: async (result: any) => {
         
-        console.log(file.split("/").pop()!);
-        
-        a.href = url;
-        a.download = file.split("/").pop()!;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        window.URL.revokeObjectURL(url);
+        const file = await fetch("data:image/png;base64," + result.dataZip)
+        const blob = new Blob([await file.arrayBuffer()], { type: 'application/zip' })    
+        this.createDownload(blob, folder, ".zip");
       },
       error: (error) => {
         console.log(error);
       }
     })
+  } 
+
+  private downloadFile(file: string) {
+    this.storageApi.getRaw<Blob>(file, { responseType: 'blob' }).subscribe({
+      next: (data: any) => {
+        const extension = file.split("/").pop()!.split(".")[1];      
+        const blob = new Blob([data], { type: 'application/' + extension });
+        this.createDownload(blob, file, "." + extension);
+      },
+      error: (error) => {
+        console.log(error);
+      }
+    })
+  }
+
+  private createDownload(blob: Blob, objectName: string, extension: string) {
+
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+
+    a.href = url;
+    a.download = objectName.split("/").pop()! + extension;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    window.URL.revokeObjectURL(url);
   }
 
   readFile(file: string) {
