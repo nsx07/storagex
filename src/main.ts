@@ -2,9 +2,8 @@ import { bootstrapApplication } from '@angular/platform-browser';
 import { appConfig } from './app/app.config';
 import { AppComponent } from './app/app.component';
 import { environment } from './environments/environment';
-import { injectSpeedInsights } from '@vercel/speed-insights/*';
 import { enableProdMode } from '@angular/core';
-import { inject } from '@vercel/analytics/*';
+import { inject } from './../node_modules/@vercel/analytics/';
 
 Number.prototype.fileSize = function (this, a, b, c, d) {
   return (
@@ -20,7 +19,6 @@ Number.prototype.fileSize = function (this, a, b, c, d) {
 };
 
 if (environment.production) {
-  injectSpeedInsights();
   enableProdMode();
   inject();
 }

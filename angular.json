@@ -16,22 +16,18 @@
             "outputPath": "dist/storagex",
             "index": "src/index.html",
             "browser": "src/main.ts",
-            "polyfills": [
-              "zone.js"
-            ],
+            "polyfills": ["zone.js"],
             "tsConfig": "tsconfig.app.json",
-            "assets": [
-              "src/assets/exs.png",
-              "src/favicon.ico",
-              "src/assets"
-            ],
-            "styles": [
-              "src/styles.css"
-            ],
+            "assets": ["src/assets/exs.png", "src/favicon.ico", "src/assets"],
+            "styles": ["src/styles.css"],
             "scripts": []
           },
           "configurations": {
             "production": {
+              "sourceMap": false,
+              "optimization": true,
+              "outputHashing": "all",
+              "aot": true,
               "budgets": [
                 {
                   "type": "initial",
@@ -44,7 +40,6 @@
                   "maximumError": "4kb"
                 }
               ],
-              "outputHashing": "all",
               "fileReplacements": [
                 {
                   "replace": "src/environments/environment.development.ts",
@@ -87,18 +82,10 @@
         "test": {
           "builder": "@angular-devkit/build-angular:karma",
           "options": {
-            "polyfills": [
-              "zone.js",
-              "zone.js/testing"
-            ],
+            "polyfills": ["zone.js", "zone.js/testing"],
             "tsConfig": "tsconfig.spec.json",
-            "assets": [
-              "src/favicon.ico",
-              "src/assets"
-            ],
-            "styles": [
-              "src/styles.css"
-            ],
+            "assets": ["src/favicon.ico", "src/assets"],
+            "styles": ["src/styles.css"],
             "scripts": []
           }
         }
