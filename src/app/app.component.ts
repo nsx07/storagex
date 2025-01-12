@@ -51,7 +51,7 @@ export type FileNode = {
               [(ngModel)]="url"
               [ngModelOptions]="{ standalone: true }"
               type="text"
-              placeholder="StorageApi Url"
+              placeholder="Enter the api host"
             />
 
             <input
@@ -59,7 +59,7 @@ export type FileNode = {
               [(ngModel)]="token"
               [ngModelOptions]="{ standalone: true }"
               type="text"
-              placeholder="StorageApi Token"
+              placeholder="Enter the api token"
             />
 
             <div class="min-w-10 flex items-center justify-end">
@@ -147,8 +147,6 @@ export type FileNode = {
     FormsModule,
     SidebarComponent,
     NavComponent,
-    TreeNodeComponent,
-    FileViewComponent,
     ModalComponent,
   ],
 })
@@ -210,8 +208,8 @@ export class AppComponent implements OnInit {
 
   sendToken() {
     this.loading = true;
-
-    this.storageApi.setApiUrl(this.url);
+    const urlWithSlash = this.url.endsWith('/') ? this.url : this.url + '/';
+    this.storageApi.setApiUrl(urlWithSlash);
 
     this.auth
       .validateToken(this.token)

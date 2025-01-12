@@ -58,6 +58,10 @@ export class StorageApi {
     localStorage.setItem('apiUrl', url);
   }
 
+  public getApiUrl() {
+    return this.baseUrl;
+  }
+
   public getUrlObject(path: string) {
     return this.baseUrl + ('wwwroot/' + path).replaceAll(/[\/\\]+/g, '/');
   }
