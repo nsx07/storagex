@@ -1,325 +1,458 @@
-import { CommonModule, DOCUMENT } from "@angular/common";
-import { Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild, inject } from "@angular/core";
-import { DragService } from "../services/drag.service";
-import { FileNode } from "../app.component";
-import { StorageApi } from "../services/storage-api.service";
-import { ContextItem, ContextMenuComponent } from "./context-menu.component";
-import { getUrlParsed } from "../utils/helper-url";
-import { FormsModule } from "@angular/forms";
-import { getFileIcon } from "../utils/fileicon-type";
-import { FileService } from "../services/file.service";
+import { CommonModule, DOCUMENT } from '@angular/common';
+import {
+  Component,
+  ElementRef,
+  EventEmitter,
+  Input,
+  OnInit,
+  Output,
+  ViewChild,
+  inject,
+} from '@angular/core';
+import { DragService } from '../services/drag.service';
+import { FileNode } from '../app.component';
+import { StorageApi } from '../services/storage-api.service';
+import { ContextItem, ContextMenuComponent } from './context-menu.component';
+import { getUrlParsed } from '../utils/helper-url';
+import { FormsModule } from '@angular/forms';
+import { getFileIcon } from '../utils/fileicon-type';
+import { FileService } from '../services/file.service';
 
 @Component({
-    imports: [CommonModule, ContextMenuComponent, FormsModule],
-    selector: 'tree-node',
-    standalone: true,
-    template: `
-        <div class="w-full" draggable="true" dropzone="true" (dragover)="interact(item, $event)" (drop)="interact(item, $event)" (dragleave)="dragover = false">
-            <context-menu [items]="contextItens">  
-                <div class="cursor-pointer rounded dark:hover:bg-slate-500 hover:bg-slate-300 w-full" (dragenter)="interact(item, $event)" 
-                    (dragstart)="interact(item, $event)" (dragend)="interact(item, $event)">
+  imports: [CommonModule, ContextMenuComponent, FormsModule],
+  selector: 'tree-node',
+  standalone: true,
+  template: `
+    <div
+      class="w-full"
+      draggable="true"
+      dropzone="true"
+      (dragover)="interact(item, $event)"
+      (drop)="interact(item, $event)"
+      (dragleave)="dragover = false"
+    >
+      <context-menu [items]="contextItens">
+        <div
+          class="cursor-pointer rounded dark:hover:bg-slate-500 hover:bg-slate-300 w-full"
+          (dragenter)="interact(item, $event)"
+          (dragstart)="interact(item, $event)"
+          (dragend)="interact(item, $event)"
+        >
+          <div
+            class="tracking-wide leading-5 w-full rounded-md flex items-center justify-between gap-2 p-2 text-slate-900 dark:text-slate-200"
+          >
+            <div
+              class="flex gap-4 items-center"
+              (click)="interact(item, $event)"
+              (dblclick)="interact(item, $event)"
+            >
+              @if (item.type == "file") {
+              <img [src]="icon" width="20" height="auto" alt="icon-file-type" />
+              } @else {
+              <i
+                class="fa-solid"
+                [ngClass]="{
+                  'fa-folder': !collapseOpened,
+                  'fa-folder-open': collapseOpened
+                }"
+              ></i>
+              }
+              <span
+                class="relative flex w-max items-center rounded-lg dark:text-slate-200 text-slate-500"
+                [ngClass]="{
+                  'border-2 dark:border-slate-300 border-slate-600 z-10 px-2 py-1':
+                    rename
+                }"
+              >
+                @if (rename) {
+                <input
+                  type="text"
+                  (click)="$event.stopPropagation()"
+                  [disabled]="!rename"
+                  [(ngModel)]="item.name"
+                  (keyup)="changeName($event)"
+                  [ngClass]="{
+                    'dark:text-slate-300 text-slate-600 z-10': rename,
+                    'z-0': !rename
+                  }"
+                  class="resize-none flex-1 max-w-[50vw] z-[100] text-ellipsis overflow-hidden border text-base focus:outline-none bg-transparent appearance-none border-transparent focus:border-transparent"
+                />
 
-                        <div class="tracking-wide leading-5 w-full rounded-md flex items-center justify-between gap-2 p-2 text-slate-900 dark:text-slate-200">
-                            <div class="flex gap-4 items-center" (click)="interact(item, $event)" (dblclick)="interact(item, $event)">
-                                @if (item.type == "file") {
-                                    <img [src]="icon" width="20" height="auto" alt="icon-file-type">
-                                } @else {
-                                    <i class="fa-solid" [ngClass]="{'fa-folder': !collapseOpened, 'fa-folder-open': collapseOpened}"></i>
-                                }
-                                <span class="relative flex w-max items-center rounded-lg dark:text-slate-200 text-slate-500" [ngClass]="{'border-2 dark:border-slate-300 border-slate-600 z-10 px-2 py-1': rename}">
-
-                                    @if (rename) {
-                                        <input type="text" (click)="$event.stopPropagation()" [disabled]="!rename" [(ngModel)]="item.name" (keyup)="changeName($event)" [ngClass]="{'dark:text-slate-300 text-slate-600 z-10': rename, 'z-0': !rename}"
-                                            class="resize-none flex-1 max-w-[50vw] z-[100] text-ellipsis overflow-hidden border text-base focus:outline-none bg-transparent appearance-none border-transparent focus:border-transparent"
-                                        />
-
-                                        <div class="rounded-lg right-1 cursor-pointer dark:text-slate-400 text-slate-700" *ngIf="rename" (click)="changeName(undefined, true)">
-                                            <i class="fa-solid fa-circle-check fa-lg"></i>
-                                        </div>  
-                                    } @else {
-                                        <span class="resize-none flex-1 max-w-[50vw] text-ellipsis overflow-hidden border text-base focus:outline-none bg-transparent appearance-none border-transparent focus:border-transparent">
-                                            {{item.name}}
-                                        </span>
-                                    }
-
-
-                                </span>
-                            </div>
-
-                            <section class="md:hidden block z-20">
-                                <context-menu [items]="contextItens" [forMobile]="true" style="z-index: auto;">
-                                    <div class="p-2 flex items-center">
-                                        <i class="fa-solid fa-ellipsis-vertical"></i>
-                                    </div>
-                                </context-menu>
-                            </section>
-                            <section class="gap-2 md:flex hidden">
-                                <span class="pl-2 leading-tight font-medium text-md">{{item.size ? (item.size).fileSize() : item.size }}</span>
-                                <span class="pl-2 leading-tight font-medium text-md">{{item.datetime | date: "dd/MM/yy HH:mm"}}</span>
-                            </section>
-                        </div>
-                        
+                <div
+                  class="rounded-lg right-1 cursor-pointer dark:text-slate-400 text-slate-700"
+                  *ngIf="rename"
+                  (click)="changeName(undefined, true)"
+                >
+                  <i class="fa-solid fa-circle-check fa-lg"></i>
                 </div>
-            </context-menu>
-
-            @if (item.type == "folder") {
-                
-                <div class="flex items-center justify-center w-full py-1 relative" [ngClass]="{'hidden': !dragover}">
-                    <div class="absolute top-2 right-2 rounded-md">
-                        <span class="cursor-pointer text-gray-500 dark:text-gray-400 dark:hover:text-slate-200 hover:text-slate-800" (click)="dragover = false">
-                            <i class="fa-solid fa-xmark fa-lg"></i>
-                        </span>
-                    </div>
-                    <label [for]="uniqueRandom" class="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 dark:hover:bg-bray-800 dark:bg-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-600">
-                        <div class="flex flex-col items-center justify-center pt-5 pb-6 text-gray-500 dark:text-gray-400">
-                            <svg class="w-8 h-8 mb-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 16">
-                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2"/>
-                            </svg>
-                            <p class="mb-2 text-sm"><span class="font-semibold">Click to upload</span> or drag and drop</p>
-                        </div>
-                        <input [id]="uniqueRandom" type="file" class="invisible" max="5" multiple (change)="upload($event)"/>
-                    </label>
-                </div> 
-
-                @if (collapseOpened) {
-                    <div class="pl-4">
-                        @for (contentItem of item.content; track contentItem.name) {
-                            <tree-node [item]="contentItem" (open)="openClick($event)" (delete)="this.commandHandler.delete($event)"></tree-node>
-                        } @empty {
-                            <div class="p-2 text-gray-500 dark:text-gray-400">Empty folder</div>
-                        }
-                    </div>
+                } @else {
+                <span
+                  class="resize-none flex-1 max-w-[50vw] text-ellipsis overflow-hidden border text-base focus:outline-none bg-transparent appearance-none border-transparent focus:border-transparent"
+                >
+                  {{ item.name }}
+                </span>
                 }
+              </span>
+            </div>
 
-            } 
-
+            <section class="md:hidden block z-20">
+              <context-menu
+                [items]="contextItens"
+                [forMobile]="true"
+                style="z-index: auto;"
+              >
+                <div class="p-2 flex items-center">
+                  <i class="fa-solid fa-ellipsis-vertical"></i>
+                </div>
+              </context-menu>
+            </section>
+            <section class="gap-2 md:flex hidden">
+              <span class="pl-2 leading-tight font-medium text-md">{{
+                item.size ? item.size.fileSize() : item.size
+              }}</span>
+              <span class="pl-2 leading-tight font-medium text-md">{{
+                item.datetime | date : 'dd/MM/yy HH:mm'
+              }}</span>
+            </section>
+          </div>
         </div>
-    `,
+      </context-menu>
+
+      @if (item.type == "folder") {
+
+      <div
+        class="flex items-center justify-center w-full py-1 relative"
+        [ngClass]="{ hidden: !dragover }"
+      >
+        <div class="absolute top-2 right-2 rounded-md">
+          <span
+            class="cursor-pointer text-gray-500 dark:text-gray-400 dark:hover:text-slate-200 hover:text-slate-800"
+            (click)="dragover = false"
+          >
+            <i class="fa-solid fa-xmark fa-lg"></i>
+          </span>
+        </div>
+        <label
+          [for]="uniqueRandom"
+          class="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 dark:hover:bg-bray-800 dark:bg-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-600"
+        >
+          <div
+            class="flex flex-col items-center justify-center pt-5 pb-6 text-gray-500 dark:text-gray-400"
+          >
+            <svg
+              class="w-8 h-8 mb-4"
+              aria-hidden="true"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 20 16"
+            >
+              <path
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2"
+              />
+            </svg>
+            <p class="mb-2 text-sm">
+              <span class="font-semibold">Click to upload</span> or drag and
+              drop
+            </p>
+          </div>
+          <input
+            [id]="uniqueRandom"
+            type="file"
+            class="invisible"
+            max="5"
+            multiple
+            (change)="upload($event)"
+          />
+        </label>
+      </div>
+
+      @if (collapseOpened) {
+      <div class="pl-4">
+        @for (contentItem of item.content; track contentItem.uid) {
+        <tree-node
+          [item]="contentItem"
+          (open)="openClick($event)"
+          (delete)="this.commandHandler.delete($event)"
+        ></tree-node>
+        } @empty {
+        <div class="p-2 text-gray-500 dark:text-gray-400">Empty folder</div>
+        }
+      </div>
+      } }
+    </div>
+  `,
 })
 export class TreeNodeComponent implements OnInit {
-    
-    ngOnInit(): void {
-        this.contextItens = [
-            {type: "folder", name: "Upload", icon: "fa-solid fa-upload", command: () => this.commandHandler.newFile()},
-            {type: "folder", name: "New file", icon: "fa-solid fa-plus", command: () => this.commandHandler.newFile(), disabled: true},
-            {type: "folder", name: "New folder", icon: "fa-solid fa-folder-plus", command: () => this.commandHandler.newFolder()},
-            {type: "folder", separator: true},
-            {type: "file", name: "Open", icon: "fa-solid fa-folder-open", command: () => this.openClick(this.item), checkDisabled: () => this.item.type == "folder"},
-            {type: "*", name: "Download", icon: "fa-solid fa-download", command: () => this.fileService.download(this.storageApi.getUrlObject(this.item.path.replace(/\\/g, "/")), this.item.type == "folder")},
-            {type: "*", name: "Rename", icon: "fa-solid fa-pencil", command: () => this.commandHandler.rename()},
-            {type: "*", separator: true},
-            {type: "*", name: "Delete", icon: "fa-solid fa-trash", command: () => this.commandHandler.delete(this.item)},
-        ].filter(x => x.type == "*" || x.type == this.item.type);
-        
-        this.getIcon();
+  ngOnInit(): void {
+    this.contextItens = [
+      {
+        type: 'folder',
+        name: 'Upload',
+        icon: 'fa-solid fa-upload',
+        command: () => this.commandHandler.newFile(),
+      },
+      {
+        type: 'folder',
+        name: 'New file',
+        icon: 'fa-solid fa-plus',
+        command: () => this.commandHandler.newFile(),
+        disabled: true,
+      },
+      {
+        type: 'folder',
+        name: 'New folder',
+        icon: 'fa-solid fa-folder-plus',
+        command: () => this.commandHandler.newFolder(),
+      },
+      { type: 'folder', separator: true },
+      {
+        type: 'file',
+        name: 'Open',
+        icon: 'fa-solid fa-folder-open',
+        command: () => this.openClick(this.item),
+        checkDisabled: () => this.item.type == 'folder',
+      },
+      {
+        type: '*',
+        name: 'Download',
+        icon: 'fa-solid fa-download',
+        command: () =>
+          this.fileService.download(
+            this.storageApi.getUrlObject(this.item.path.replace(/\\/g, '/')),
+            this.item.type == 'folder'
+          ),
+      },
+      {
+        type: '*',
+        name: 'Rename',
+        icon: 'fa-solid fa-pencil',
+        command: () => this.commandHandler.rename(),
+      },
+      { type: '*', separator: true },
+      {
+        type: '*',
+        name: 'Delete',
+        icon: 'fa-solid fa-trash',
+        command: () => this.commandHandler.delete(this.item),
+      },
+    ].filter((x) => x.type == '*' || x.type == this.item.type);
 
-        this.oldName = this.item.name;
+    this.getIcon();
+
+    this.oldName = this.item.name;
+  }
+
+  @Input() item!: FileNode;
+  @Output() open = new EventEmitter<FileNode>();
+  @Output() delete = new EventEmitter<FileNode>();
+
+  public icon?: string;
+  private oldName = '';
+  public rename = false;
+  public dragover = false;
+  public collapseOpened = false;
+  public contextItens: ContextItem[] = [];
+  public uniqueRandom = crypto.randomUUID();
+
+  private storageApi = inject(StorageApi);
+  private dragService = inject(DragService);
+  private fileService = inject(FileService);
+
+  public upload(event: any) {
+    event.preventDefault();
+    event.stopPropagation();
+
+    console.log(event.target.files);
+
+    if (event.target.files) {
+      const formData = new FormData();
+
+      for (let i = 0; i < event.target.files.length || i == 5; i++) {
+        formData.append('file', event.target.files[i]);
+      }
+
+      this.uploader(formData);
     }
+  }
 
-    @Input() item!: FileNode;
-    @Output() open = new EventEmitter<FileNode>();
-    @Output() delete = new EventEmitter<FileNode>();
+  private getIcon() {
+    if (this.item.type == 'folder') return;
 
-    public icon?: string;
-    private oldName = "";
-    public rename = false;
-    public dragover = false;
-    public collapseOpened = false;
-    public contextItens: ContextItem[] = [];
-    public uniqueRandom = crypto.randomUUID();
+    this.icon = getFileIcon(
+      this.item.name.substring(this.item.name.lastIndexOf('.') + 1)
+    );
+  }
 
-    private storageApi = inject(StorageApi);
-    private dragService = inject(DragService);
-    private fileService = inject(FileService);
+  public interact(item: FileNode, event: DragEvent | MouseEvent) {
+    event.preventDefault();
+    event.stopPropagation();
 
-    public upload(event: any) {
-        event.preventDefault();
-        event.stopPropagation();
+    if (
+      event.type == 'dragover' &&
+      'dataTransfer' in event &&
+      event.dataTransfer?.items.length
+    ) {
+      this.dragover = true;
+      return;
+    } else this.dragover = false;
 
-        console.log(event.target.files);
-        
-        if (event.target.files) {
-            const formData = new FormData();
+    if (event.type == 'drop' && 'dataTransfer' in event) {
+      if (event.dataTransfer?.items) {
+        const formData = new FormData();
 
-            for (let i = 0; i < event.target.files.length || i == 5; i++) {
-                formData.append("file", event.target.files[i]);
-            }
+        for (var i = 0; i < event.dataTransfer.items.length; i++) {
+          if (event.dataTransfer.items[i].kind === 'file') {
+            var file = event.dataTransfer.items[i].getAsFile() as File;
 
-            this.uploader(formData);
-
-        }
-        
-    }
-
-    private getIcon() {
-        if (this.item.type == "folder") 
-            return;
-            
-        this.icon = getFileIcon(this.item.name.substring(this.item.name.lastIndexOf(".") + 1));
-    }
-
-    public interact(item: FileNode, event: DragEvent | MouseEvent) {
-        event.preventDefault();
-        event.stopPropagation();
-
-        if (event.type == "dragover" && 'dataTransfer' in event && event.dataTransfer?.items.length) {
-            this.dragover = true;
-            return;
-        } else this.dragover = false;
-        
-        if (event.type == "drop" && 'dataTransfer' in event) {
-            
-            if (event.dataTransfer?.items) {
-                const formData = new FormData();
-
-                for (var i = 0; i < event.dataTransfer.items.length; i++) {
-
-                    if (event.dataTransfer.items[i].kind === "file") {
-                        var file = event.dataTransfer.items[i].getAsFile() as File;
-                        
-                        formData.append("file", file);
-                    }
-                }
-
-                if (formData.has("file")) {
-                    this.uploader(formData);
-                }
-            }
-
-        }
-        
-        if (event instanceof DragEvent) {
-            
-            if (event.type.toLowerCase() in this.interactHandler)
-                this.interactHandler[event.type.toLowerCase()](item)
-
-            return;
-        }
-
-        if (item.type == "file") {
-            if (event.type == "dbclick") {
-                this.commandHandler.rename()
-            } else {
-                this.openClick(item);
-            }
-            return;
-        }
-        
-        this.collapseOpened = !this.collapseOpened;
-    }
-
-    public openClick(item: FileNode) {
-        this.open.emit(item);
-    }
-
-    public changeName(event?: KeyboardEvent, save: boolean = false) {
-        if (event?.key == "Enter" || save) {
-            this.rename = false;
-            
-            let path = this.item.path.replace(this.oldName, this.item.name);
-            console.log(this.item.path, path);
-            (this.oldName !== this.item.name) && this.storageApi.patch("api/rename", {newPath: path, oldPath: this.item.path}).subscribe({
-                next: () => {
-                    this.item.path = path;
-
-                    this.renameChilds(this.item, this.oldName, this.item.name);
-
-                    this.oldName = this.item.name;
-                },
-                error: (err) => {
-                    this.item.name = this.oldName;
-                    console.log(err)
-                }
-            });
-            return;
+            formData.append('file', file);
+          }
         }
 
-        if (event?.key == "Escape") {
-            this.item.name = this.oldName;
-            this.rename = false;
-            return;
+        if (formData.has('file')) {
+          this.uploader(formData);
         }
+      }
     }
 
-    private renameChilds(node: FileNode, old: string, updated: string) {
-        node.path.replace(old, updated);
-        for (const item of node.content) {
-            item.path.replace(old, updated);
+    if (event instanceof DragEvent) {
+      if (event.type.toLowerCase() in this.interactHandler)
+        this.interactHandler[event.type.toLowerCase()](item);
 
-            if (item.type === "folder" && item.content?.length) {
-                this.renameChilds(item, old, updated);
-            }
-        }
+      return;
     }
 
-    private uploader(formData: FormData) {
-        
-        console.log(getUrlParsed(this.item.path, false, false));
-        
-        this.storageApi.post("api/save", formData, getUrlParsed(this.item.path, this.item.type === "folder", false)).subscribe({
-            next: data => {
+    if (item.type == 'file') {
+      if (event.type == 'dbclick') {
+        this.commandHandler.rename();
+      } else {
+        this.openClick(item);
+      }
+      return;
+    }
 
-                if (Array.isArray(data)) {
-                    data.forEach(x => {
-                        this.item.content.push({
-                            content: [],
-                            size: x.size,
-                            type: "file",
-                            name: x.fileName,
-                            datetime: new Date(),
-                            uid: crypto.randomUUID(),
-                            path: x.filePath.replace(`\\`, "/"),
-                            order: this.item.content.length + 1,
-                        })
-                    });
-                }
+    this.collapseOpened = !this.collapseOpened;
+  }
+
+  public openClick(item: FileNode) {
+    this.open.emit(item);
+  }
+
+  public changeName(event?: KeyboardEvent, save: boolean = false) {
+    if (event?.key == 'Enter' || save) {
+      this.rename = false;
+      let path = this.item.path.replace(this.oldName, this.item.name);
+      this.oldName !== this.item.name &&
+        this.storageApi
+          .patch('api/rename', { newPath: path, oldPath: this.item.path })
+          .subscribe({
+            next: () => {
+              this.item.path = path;
+
+              this.renameChilds(this.item, this.oldName, this.item.name);
+
+              this.oldName = this.item.name;
             },
-            complete: () => {
-                this.dragover = false;
-            }
-        });
+            error: (err) => {
+              this.item.name = this.oldName;
+              console.log(err);
+            },
+          });
+      return;
     }
 
-    private interactHandler : Record<string, (item: FileNode) => void> = {
-        dragstart: item => this.dragService.startDrag(item),
-        dragenter: item => this.dragService.setSwapData(item),
-        dragend: item => this.dragService.endDrag(item)
+    if (event?.key == 'Escape') {
+      this.item.name = this.oldName;
+      this.rename = false;
+      return;
     }
+  }
 
-    public commandHandler = {
-        newFolder: () => {
-            const named = this.item.content.filter(x => x.name.startsWith("New folder")).length;
-            
-            const folder = {
-                content: [],
-                size: 0,
-                type: "folder",
-                name: "New folder" + (named ? ` (${named})` : ""),
-                datetime: new Date(),
-                uid: crypto.randomUUID(),
-                path: `${this.item.path}/New folder` + (named ? ` (${named})` : ""),
-                order: this.item.content.length + 1,
-            };
-            
-            this.storageApi.post("api/createDirectory", {path: folder.path}).subscribe(data => {
-                this.item.content.push(folder);
+  private renameChilds(node: FileNode, old: string, updated: string) {
+    node.path.replace(old, updated);
+    for (const item of node.content) {
+      item.path.replace(old, updated);
+
+      if (item.type === 'folder' && item.content?.length) {
+        this.renameChilds(item, old, updated);
+      }
+    }
+  }
+
+  private uploader(formData: FormData) {
+    this.storageApi
+      .post(
+        'api/save',
+        formData,
+        getUrlParsed(this.item.path, this.item.type === 'folder', false)
+      )
+      .subscribe({
+        next: (data) => {
+          if (!Array.isArray(data)) {
+            data = [data];
+          }
+
+          data.forEach((x: any) => {
+            this.item.content.push({
+              content: [],
+              size: x.size,
+              type: 'file',
+              name: x.fileName,
+              datetime: new Date(),
+              uid: crypto.randomUUID(),
+              order: this.item.content.length + 1,
+              path: x.projectName + '/' + x.fileName,
             });
-        
+          });
         },
-        newFile: () => {
-            this.dragover = true;
-            console.log("new file");
-            
+        complete: () => {
+          this.dragover = false;
         },
-        rename: () => {
-            this.rename = true;
-        },
-        copy: () => {},
-        cut: () => {},
-        move: () => {},
-        delete: (item: FileNode) => this.delete.emit(item)
+      });
+  }
 
-    }
+  private interactHandler: Record<string, (item: FileNode) => void> = {
+    dragstart: (item) => this.dragService.startDrag(item),
+    dragenter: (item) => this.dragService.setSwapData(item),
+    dragend: (item) => this.dragService.endDrag(item),
+  };
 
+  public commandHandler = {
+    newFolder: () => {
+      const named = this.item.content.filter((x) =>
+        x.name.startsWith('New folder')
+      ).length;
 
+      const folder = {
+        content: [],
+        size: 0,
+        type: 'folder',
+        name: 'New folder' + (named ? ` (${named})` : ''),
+        datetime: new Date(),
+        uid: crypto.randomUUID(),
+        path: `${this.item.path}/New folder` + (named ? ` (${named})` : ''),
+        order: this.item.content.length + 1,
+      };
+
+      this.storageApi
+        .post('api/createDirectory', { path: folder.path })
+        .subscribe((data) => {
+          this.item.content.push(folder);
+        });
+    },
+    newFile: () => {
+      this.dragover = true;
+      console.log('new file');
+    },
+    rename: () => {
+      this.rename = true;
+    },
+    copy: () => {},
+    cut: () => {},
+    move: () => {},
+    delete: (item: FileNode) => this.delete.emit(item),
+  };
 }
