@@ -99,7 +99,7 @@ import { CustomValidators } from '../../utils/custom-validators';
                     class="fa-solid fa-edit fa-lg cursor-pointer"
                   ></i>
                   <i
-                    (click)="remove(item.key)"
+                    (click)="remove(item.name)"
                     class="fa-solid fa-trash fa-lg cursor-pointer"
                   ></i>
                 </div>
@@ -402,13 +402,12 @@ export class BackupComponent implements OnInit {
       });
   }
 
-  remove(key: string) {
-    console.log(key);
-    this.storageApi.delete('api/removeBackup', { name: key }).subscribe({
+  remove(name: string) {
+    this.storageApi.delete('api/removeBackup', { name }).subscribe({
       next: (x) => {
         console.log(x);
         if (x) {
-          this.data = this.data.filter((x) => x.key != key);
+          this.data = this.data.filter((x) => x.name != name);
         }
       },
       error: (e) => {
