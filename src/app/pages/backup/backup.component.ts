@@ -328,7 +328,7 @@ export class BackupComponent implements OnInit {
     let result = await firstValueFrom(this.storageApi.get('api/listBackups'));
     console.log(result);
 
-    this.data = result;
+    this.data = result.schedules;
   }
 
   private createForm() {
